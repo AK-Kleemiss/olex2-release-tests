@@ -132,7 +132,7 @@ def fetch_updates():
     if behind in ("", "0"):
         print("release-tests repository is up to date with GitHub")
         return
-    if git("status", "--porcelain").stdout.strip():
+    if git("status", "--porcelain", "--untracked-files=no").stdout.strip():
         banner("GOLDENS OUT OF DATE", ["GitHub is %s commit(s) ahead but this clone has local changes;" % behind,
                                        "not pulling - commit or discard them, or pass --no-fetch"])
         return
