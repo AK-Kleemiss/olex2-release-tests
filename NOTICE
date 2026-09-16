@@ -1,0 +1,12 @@
+Sample structures in sample_data/
+
+  epoxide   from the NoSpherA2 test set (tests/epoxide_gbw), BSD-2-Clause,
+            Copyright (c) Florian Kleemiss
+  sucrose   Olex2 sample_data (OlexSys Ltd), redistributed for testing
+  water     Olex2 sample_data (OlexSys Ltd), redistributed for testing
+  ZP2       Olex2 sample_data (OlexSys Ltd), redistributed for testing
+  malbac    structure from Olex2 sample_data (OlexSys Ltd); reflection file
+            from the NoSpherA2 test set (tests/ECP_SF)
+
+The scripts in this repository (run_release_tests.py, compare_golden.py) are
+released under the BSD-2-Clause license, see LICENSE.
