@@ -254,6 +254,7 @@ def build_env(args, olex2_dir, out, data, scratch, samples, log_path, table_path
     env["OLEX2_TEST_SCRATCH"] = scratch
     env["OLEX2_TEST_OUT"] = table_path
     env["OLEX2_TEST_RELEASE_LOG"] = log_path
+    env["OLEX2_TEST_GUI_DIR"] = os.path.join(out, "gui")
     return env
 
 
@@ -319,6 +320,19 @@ def launch(args, olex2_dir, exe, env, out, entry):
         argv = [exe]
     print("running: " + " ".join(argv))
     return subprocess.Popen(argv, **kw)
+
+
+def write_gui_index(out):
+    """gui/index.html: every screenshot the GUI cases took, for a look."""
+    d = os.path.join(out, "gui")
+    if not os.path.isdir(d):
+        return None
+    shots = sorted(f for f in os.listdir(d) if f.endswith(".png"))
+    rows = ["<h2>%s</h2><img src='%s' style='max-width:100%%;border:1px solid #888'>"
+            "<p><a href='%s.html'>html tree</a></p>" % (s[:-4], s, s[:-4]) for s in shots]
+    write_text(os.path.join(d, "index.html"),
+               "<html><body style='font-family:sans-serif'>%s</body></html>\n" % "\n".join(rows))
+    return d, len(shots)
 
 
 def print_timings(log_path):
@@ -420,6 +434,9 @@ def main(argv=None):
     print(open(log_path, errors="replace").read().rstrip())
     print()
     print_timings(log_path)
+    gui = write_gui_index(out)
+    if gui:
+        print("gui    %s (%d screenshots, open index.html)" % gui)
     if not args.keep_scratch:
         shutil.rmtree(scratch, ignore_errors=True)
 

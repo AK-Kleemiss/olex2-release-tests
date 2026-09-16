@@ -33,6 +33,10 @@ comparer, sample structures and goldens.
 | `orca_qmmm_epoxide` | embedded (MOL-CRYSTAL-QMMM) ORCA | full |
 | `hybrid_zp2_ptb_orca` | Hybrid mode, PART 1 = pTB, PART 2 = ORCA | full |
 | `hybrid_zp2_discamb_orca` | Hybrid mode, PART 1 = discambMATTS, PART 2 = ORCA | full |
+| `gui_tabs_and_panels` | every main tab and tool-bar panel renders without an error line | quick |
+| `gui_refine_nosphera2` | the refine panel with NoSpherA2 on: its controls and three blocks | quick |
+| `gui_sources` | each entry of the source combo rebuilds the NoSpherA2 block | quick |
+| `gui_log_clean` | the error lines of the whole Olex2 log, as known kinds (goal: 0) | quick |
 
 Every case runs one HAR cycle and records the spherical and the aspherical R1,
 the table used, and the integers that prove the path was really taken (ECP
@@ -53,6 +57,11 @@ python run_release_tests.py --olex2-dir /path/to/unpacked/olex2 \
   `runonce.release_tests.txm` file that is removed when the run is over.
 - Everything else (data directory, refinement scratch, a copy of the samples,
   the log) goes to `--out-dir` (default `release_out/` next to the script).
+- The `gui_*` cases (GUI build only, skipped with olex2c) also leave
+  `<out-dir>/gui/index.html`: a screenshot of the Olex2 window for every tab,
+  panel and source next to the html tree it was rendered from. The golden
+  holds what a script can decide; the pictures are for a human look at
+  clipped labels, overlapping controls or an empty panel.
 - `--full` adds the ORCA cases; ORCA must be on `PATH` or configured in Olex2.
 - Linux without a display: `xvfb-run -a python run_release_tests.py ...`.
 - Windows developers can use the console build instead of the GUI:

@@ -2,6 +2,10 @@ PASS cubes_epoxide_ptb  tsc=epoxide.tscb cycles=1 R1_sph=0.0353 R1_asp=0.0344 cu
 PASS discamb_gui_get_entry  get_entries=1 opened=discamb
 PASS discamb_sucrose  tsc=sucrose.tsc cycles=1 R1_sph=0.0344 R1_asp=0.0292
 PASS grown_water_ptb  tsc=water.tscb cycles=1 R1_sph=0.0333 R1_asp=0.0295 atoms_asu=26 atoms_grown=48 multiplicity=6
+PASS gui_log_clean  log_errors=2 Error reading dictionary at line <n> | Plugin loader initialisation failed: 'Module use of python<n>.dll conf
+PASS gui_refine_nosphera2  controls=8/8 blocks=3 errors=0
+PASS gui_sources  sources=Thakkar IAM,discambMATTS2tsc,Tonto,xTB,pTB,ORCA 6.1,OCC,fragHAR,SALTED distinct_panels=9 errors=0
+PASS gui_tabs_and_panels  rendered=home,work,view,tools,info,solve,refine,draw,report errors=0
 PASS hybrid_zp2_discamb_orca  tsc=ZP2_total.tscb cycles=1 R1_sph=0.0380 R1_asp=0.0323 parts=1,2 atoms_part1=25 atoms_part2=25 part1=DiscaMB part2=ORCA wfn=ZP2_part2.gbw tables=ZP2_part_1.tsc ecp=0
 PASS hybrid_zp2_discamb_ptb  tsc=ZP2_total.tscb cycles=1 R1_sph=0.0380 R1_asp=0.0323 parts=1,2 atoms_part1=25 atoms_part2=25 part1=DiscaMB part2=pTB wfn=ZP2_part2.xtb tables=ZP2_part_1.tsc ecp=28
 PASS hybrid_zp2_ptb_orca  tsc=ZP2.tscb cycles=1 R1_sph=0.0380 R1_asp=0.0321 parts=1,2 atoms_part1=25 atoms_part2=25 part1=pTB part2=ORCA wfn=ZP2_part1.xtb;ZP2_part2.gbw tables=- ecp=28
@@ -19,4 +23,4 @@ PASS salted_v6_epoxide  tsc=epoxide.tscb cycles=1 R1_sph=0.0353 R1_asp=0.0323 mo
 PASS salted_v6_sucrose  tsc=sucrose.tscb cycles=1 R1_sph=0.0344 R1_asp=0.0288 model=combo_v6.salted
 PASS setup  
 PASS xcw_epoxide  tscbs=NA2_0000000.tscb;NA2_0010000.tscb status="finished, no halting lambda reported" gui=run,stop,use source=epoxide_xcw_0010000.tscb R1_sph=0.0353 R1_xcw=0.0312
-END 21 0 0
+END 25 0 0

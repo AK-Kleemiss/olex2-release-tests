@@ -673,3 +673,9 @@ for _p1, _p2, _tier in HYBRID_COMBOS:
 for _method, _basis in OCC_METHOD_BASIS:
   CASES.append(("occ_%s_%s_epoxide" % (_method.lower(), _basis), "quick", c_occ,
                 {"method": _method, "basis": _basis}))
+# the GUI layer: the panels first, on a fresh window, and the log check last
+# so it covers everything the refinements printed as well
+import gui_tests
+CASES = ([(n, "quick", f, {}) for n, f in gui_tests.CASES if n != "gui_log_clean"]
+         + CASES
+         + [(n, "quick", f, {}) for n, f in gui_tests.CASES if n == "gui_log_clean"])
