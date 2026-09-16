@@ -13,9 +13,13 @@ refinement scratch, a copy of the sample data, the log - goes to --out-dir
 (default: release_out next to this script).
 
 Olex2 starts with its GUI (on a Linux box without a display wrap the call in
-xvfb-run), runs util/pyUtil/regression/olex2_pipeline_tests/run_pipeline.py
-for the "release" group and exits by itself. The log it writes is compared
-with expected/release_tests.<tier>.good by compare_golden.py:
+xvfb-run), runs olex2_pipeline_tests/run_pipeline.py from this repository
+(the same files live in the Olex2 SVN under util/pyUtil/regression, but they
+are not shipped to users) for the "release" group and exits by itself. Before
+anything starts the repository is fetched from GitHub and fast-forwarded when
+it is behind, so the goldens are the current ones (--no-fetch skips that).
+The log Olex2 writes is compared with expected/release_tests.<tier>.good by
+compare_golden.py:
 
     exit 0   every case matches the golden
     exit 2   every case that ran matches, but some were SKIPPED (an external
@@ -42,7 +46,7 @@ sys.path.insert(0, HERE)
 import compare_golden  # noqa: E402
 
 RUNONCE = "runonce.release_tests.txm"
-PIPELINE = os.path.join("util", "pyUtil", "regression", "olex2_pipeline_tests")
+TESTS_DIR = os.path.join(HERE, "olex2_pipeline_tests")
 
 
 def platform_tag():
@@ -95,9 +99,6 @@ def check_bundle(olex2_dir):
     nsa2 = [n for n in ("NoSpherA2.exe", "NoSpherA2") if os.path.isfile(os.path.join(olex2_dir, n))]
     if not nsa2:
         problems.append("no NoSpherA2 executable next to olex2.tag")
-    for n in ("run_pipeline.py", "group_release.py", "group_nsa2_matrix.py", "pipeline_tests.py"):
-        if not os.path.isfile(os.path.join(olex2_dir, PIPELINE, n)):
-            problems.append("%s missing - this Olex2 predates the release group" % os.path.join(PIPELINE, n))
     if os.path.exists(os.path.join(olex2_dir, RUNONCE)):
         problems.append("%s already in the bundle: another run is in progress, or a "
                         "previous one was killed; remove it by hand" % RUNONCE)
@@ -105,6 +106,43 @@ def check_bundle(olex2_dir):
         die("\n  ".join(["the bundle in %s cannot be tested:" % olex2_dir] + problems))
     tag = open(os.path.join(olex2_dir, "olex2.tag"), errors="ignore").read().strip()
     return tag, nsa2[0]
+
+
+def check_tests_dir(tests_dir):
+    for n in ("run_pipeline.py", "pipeline_tests.py", "group_nosphera2.py",
+              "group_nsa2_matrix.py", "group_release.py"):
+        if not os.path.isfile(os.path.join(tests_dir, n)):
+            die("%s missing from --tests-dir %s" % (n, tests_dir))
+
+
+def fetch_updates():
+    """The goldens are the contract: make sure this clone is at the remote's
+    head before a single case runs. A clone with local edits is left alone
+    but said so, loudly."""
+    def git(*a):
+        return subprocess.run(["git", "-C", HERE] + list(a), capture_output=True, text=True)
+    if git("rev-parse", "--is-inside-work-tree").returncode != 0:
+        banner("NOT A GIT CLONE", ["%s is not a clone of the release-tests repository," % HERE,
+                                   "the goldens may be stale - clone it to get update checks"])
+        return
+    if git("fetch", "origin").returncode != 0:
+        banner("NO GITHUB", ["git fetch origin failed, cannot check the goldens for updates"])
+        return
+    behind = git("rev-list", "--count", "HEAD..@{u}").stdout.strip()
+    if behind in ("", "0"):
+        print("release-tests repository is up to date with GitHub")
+        return
+    if git("status", "--porcelain").stdout.strip():
+        banner("GOLDENS OUT OF DATE", ["GitHub is %s commit(s) ahead but this clone has local changes;" % behind,
+                                       "not pulling - commit or discard them, or pass --no-fetch"])
+        return
+    r = git("pull", "--ff-only")
+    if r.returncode != 0:
+        banner("GOLDENS OUT OF DATE", ["GitHub is %s commit(s) ahead and the fast-forward failed:" % behind]
+               + r.stderr.strip().splitlines())
+        return
+    banner("UPDATED", ["pulled %s commit(s) from GitHub; the run uses the new goldens" % behind,
+                       "restart if run_release_tests.py itself changed"])
 
 
 def fresh_dir(path):
@@ -150,8 +188,7 @@ import os, sys, traceback
 out = {out!r}
 open(os.path.join(out, "entry.started"), "w").write("started\n")
 try:
-  script = os.path.join({basedir_expr}, "util", "pyUtil", "regression",
-                        "olex2_pipeline_tests", "run_pipeline.py")
+  script = {script!r}
   g = {{"__name__": "olex2_release_tests_entry", "__file__": script}}
   exec(compile(open(script).read(), script, "exec"), g)
 except SystemExit:
@@ -165,9 +202,9 @@ finally:
 '''
 
 
-def write_entry(out):
+def write_entry(out, tests_dir):
     path = os.path.join(out, "data", "release_tests_entry.py")
-    write_text(path, "import olx\n" + ENTRY.format(out=out, basedir_expr="olx.BaseDir()"))
+    write_text(path, ENTRY.format(out=out, script=os.path.join(tests_dir, "run_pipeline.py")))
     return path
 
 
@@ -311,6 +348,9 @@ def main(argv=None):
     ap.add_argument("--olex2c", help="Windows: run through this olex2c.exe console build instead of the GUI")
     ap.add_argument("--pythonhome", help="PYTHONHOME for the run (default: <olex2-dir>/Python when present)")
     ap.add_argument("--data-dir", default=os.path.join(HERE, "sample_data"))
+    ap.add_argument("--tests-dir", default=TESTS_DIR,
+                    help="the olex2_pipeline_tests modules to run (default: the copy in this repository)")
+    ap.add_argument("--no-fetch", action="store_true", help="do not check GitHub for newer goldens first")
     ap.add_argument("--salted-model", help="directory holding the SALTED model (.salted); without it the SALTED cases are skipped")
     tier = ap.add_mutually_exclusive_group()
     tier.add_argument("--full", action="store_true", help="also the ORCA cases (ORCA must be installed)")
@@ -339,12 +379,16 @@ def main(argv=None):
         golden = per_platform if os.path.isfile(per_platform) else \
             os.path.join(HERE, "expected", "release_tests.%s.good" % tier_name)
 
+    if not args.no_fetch:
+        fetch_updates()
+    tests_dir = os.path.abspath(args.tests_dir)
+    check_tests_dir(tests_dir)
     tag, nsa2 = check_bundle(olex2_dir)
     exe = None if args.olex2c else find_exe(olex2_dir, args.olex2_exe)
     out, data, scratch, samples = prepare_out(args)
     log_path = os.path.join(out, "release_tests.%s.log" % tier_name)
     table_path = os.path.join(out, "release_tests.%s.table.txt" % tier_name)
-    entry = write_entry(out)
+    entry = write_entry(out, tests_dir)
     env = build_env(args, olex2_dir, out, data, scratch, samples, log_path, table_path)
 
     print("Olex2 %s in %s (%s), tier %s, %s" % (tag, olex2_dir, nsa2, tier_name,

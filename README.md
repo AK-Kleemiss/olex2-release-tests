@@ -5,10 +5,13 @@ run inside the *shipped* Olex2 bundle, the result is written as a plain-text log
 and the log is compared with a golden log kept in this repository. Meant to be
 run before a major Olex2 release, on Windows, Linux and macOS.
 
-The test code itself lives in the Olex2 GUI tree
-(`util/pyUtil/regression/olex2_pipeline_tests/`, group `release`), so it ships
-with every bundle. This repository holds what the bundle does not: the driver,
-the comparer, the sample structures and the goldens.
+The test code (`olex2_pipeline_tests/`, group `release`) runs inside Olex2
+but is not shipped with it: the same files live in the Olex2 SVN under
+`util/pyUtil/regression/olex2_pipeline_tests/` without the `olex-install` /
+`olex-update` properties, so users never see them. Edit them in the SVN and
+copy them here (or the other way round; `diff -r` between the two says which
+side is behind). This repository is the whole test: driver, test modules,
+comparer, sample structures and goldens.
 
 ## What is tested
 
@@ -42,6 +45,9 @@ python run_release_tests.py --olex2-dir /path/to/unpacked/olex2 \
                             --salted-model /path/to/Model_V6 [--full]
 ```
 
+- Before anything starts the driver runs `git fetch` and fast-forwards this
+  clone when GitHub is ahead, so the goldens are the current ones; a clone
+  with local changes is not touched but gets a banner. `--no-fetch` skips it.
 - `--olex2-dir` is the unpacked bundle (the directory with `olex2.tag`, the
   NoSpherA2 executable and `util/pyUtil`). It is not modified beyond a
   `runonce.release_tests.txm` file that is removed when the run is over.
