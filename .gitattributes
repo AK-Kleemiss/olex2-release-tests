@@ -1,0 +1,6 @@
+* text=auto
+*.good text eol=lf
+*.py text eol=lf
+*.hkl -text
+*.ins -text
+*.cif -text
