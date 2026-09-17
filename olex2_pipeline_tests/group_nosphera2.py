@@ -217,8 +217,8 @@ def t_backend(suite, name, slow, full):
     os.path.basename(tsc), cycles, r_spherical, r_aspherical)
 
 
-def _refine_capturing():
-  """Run the refinement and keep what it printed, still showing it."""
+def _refine_capturing(cmd="spy.refine.do_refine"):
+  """Run the refinement (or another macro) and keep what it printed, still showing it."""
   import io
   import sys
   buf = io.StringIO()
@@ -246,7 +246,7 @@ def _refine_capturing():
 
   sys.stdout, sys.stderr = tee(real_out, buf), tee(real_err, buf)
   try:
-    macro("spy.refine.do_refine")
+    macro(cmd)
   finally:
     sys.stdout, sys.stderr = real_out, real_err
   return buf.getvalue()

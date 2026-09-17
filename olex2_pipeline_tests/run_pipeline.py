@@ -42,6 +42,7 @@ GROUPS = {
   "hkl":       "group_hkl",
   "cif":       "group_cif",
   "solve":     "group_solve",
+  "autosolve": "group_autosolve",
   "refine":    "group_refine",
   "nosphera2": "group_nosphera2",
   "nsa2_matrix": "group_nsa2_matrix",

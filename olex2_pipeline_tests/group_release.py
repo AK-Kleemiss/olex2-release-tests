@@ -48,6 +48,7 @@ import group_nsa2_matrix as matrix
 from group_nsa2_matrix import (SAMPLES, _prepare, _set_aspherical,
                                _defaults_for, _aspherical_run, _check_moved)
 import group_nosphera2 as base
+import group_autosolve
 from group_nosphera2 import (_source_name, _refine_capturing, _reason)
 
 GROUP = "release"
@@ -660,6 +661,10 @@ CASES = [
   ("xcw_epoxide",            "quick", c_xcw, {}),
   ("grown_water_ptb",        "quick", c_grown, {}),
   ("cubes_epoxide_ptb",      "quick", c_cubes, {}),
+  ("autosolve_sucrose",      "quick", group_autosolve.t_autosolve, {"sample": "sucrose"}),
+  ("autosolve_epoxide",      "quick", group_autosolve.t_autosolve, {"sample": "epoxide"}),
+  ("autosolve_water",        "quick", group_autosolve.t_autosolve, {"sample": "water"}),
+  ("autosolve_malbac",       "quick", group_autosolve.t_autosolve, {"sample": "malbac"}),
   ("orca_epoxide",           "full",  c_orca, {}),
   ("orca_ecp_malbac",        "full",  c_orca_ecp, {}),
   ("orca_qmmm_epoxide",      "full",  c_orca_qmmm, {}),

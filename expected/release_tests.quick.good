@@ -1,3 +1,7 @@
+PASS autosolve_epoxide  sg=P2<sub>1</sub>/n sg_rank=1 n_suggest=3 trials=8 cc=0.981 peaks=5 geometry_changed=0 allowed=C,H,O pruned=2 retyped=0 atoms=5 types=C:4,O:1 typed=1.00
+PASS autosolve_malbac  sg=P-1 sg_rank=1 n_suggest=2 trials=8 cc=0.948 peaks=46 geometry_changed=6 allowed=C,Cl,H,N,O,P,Pd pruned=12 retyped=4 atoms=46 types=C:36,Cl:2,N:3,O:4,Pd:1 typed=0.97
+PASS autosolve_sucrose  sg=P2<sub>1</sub> sg_rank=1 n_suggest=3 trials=5 cc=0.993 peaks=26 geometry_changed=1 allowed=C,H,O pruned=3 retyped=1 atoms=26 types=C:14,O:12 typed=1.00
+PASS autosolve_water  sg=P2<sub>1</sub>/c sg_rank=1 n_suggest=3 trials=8 cc=0.969 peaks=18 geometry_changed=8 allowed=C,H,Mn,N,O,S pruned=2 retyped=3 atoms=18 types=C:9,Mn:1,N:4,O:3,S:1 typed=0.81
 PASS cubes_epoxide_ptb  tsc=epoxide.tscb cycles=1 R1_sph=0.0353 R1_asp=0.0344 cubes=lap,eli,def cube_atoms=7 grid=10x17x14
 PASS discamb_gui_get_entry  get_entries=1 opened=discamb
 PASS discamb_sucrose  tsc=sucrose.tsc cycles=1 R1_sph=0.0344 R1_asp=0.0292
@@ -18,4 +22,4 @@ PASS salted_v6_epoxide  tsc=epoxide.tscb cycles=1 R1_sph=0.0353 R1_asp=0.0323 mo
 PASS salted_v6_sucrose  tsc=sucrose.tscb cycles=1 R1_sph=0.0344 R1_asp=0.0288 model=combo_v6.salted
 PASS setup  
 PASS xcw_epoxide  tscbs=NA2_0000000.tscb;NA2_0010000.tscb status="finished, no halting lambda reported" gui=run,stop,use source=epoxide_xcw_0010000.tscb R1_sph=0.0353 R1_xcw=0.0312
-END 20 0 0
+END 24 0 0
