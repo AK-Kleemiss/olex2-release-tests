@@ -169,10 +169,17 @@ def prepare_out(args):
         if os.path.isfile(path) and (name.startswith("entry.") or name.startswith("release_tests.")
                                      or name.startswith("olex2")):
             os.remove(path)
-    # nothing is refined inside the repository: the cases copy from here
+    # nothing is refined inside the repository: the cases copy from here.
+    # An autosolve-only --cases run stages just its own samples: the whole
+    # set is 1 GB per out-dir, and a sweep makes hundreds of out-dirs
+    only = [c.strip() for c in (args.cases or "").split(",") if c.strip()]
+    if only and all(c.startswith("autosolve_") for c in only):
+        only = set(c[len("autosolve_"):] for c in only)
+    else:
+        only = None
     for name in sorted(os.listdir(args.data_dir)):
         src = os.path.join(args.data_dir, name)
-        if os.path.isdir(src):
+        if os.path.isdir(src) and (only is None or name.lower() in only):
             shutil.copytree(src, os.path.join(samples, name))
     # a fresh data directory would ask things on start-up and on exit
     write_text(os.path.join(data, ".options"), "confirm_on_close=false\n")
