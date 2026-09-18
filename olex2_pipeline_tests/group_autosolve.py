@@ -29,6 +29,7 @@ from __future__ import absolute_import, division, print_function
 import os
 import re
 
+import olex
 import olx
 from olexFunctions import OV
 
@@ -84,6 +85,20 @@ def _grab(pattern, text, default=None, cast=int):
   return cast(m.group(1)) if m else default
 
 
+def _expand_hkl_to_p1():
+  # the CIF-derived hkl holds one asymmetric unit; a P1 solve needs the sphere
+  from iotbx.shelx import hklf
+  from cctbx import crystal
+  src = OV.HKLSrc()
+  cs = crystal.symmetry(
+    unit_cell=[float(x) for x in olex.f("xf.au.GetCell()").split(',')],
+    space_group_symbol="hall: " + olex.f("sg(%HS)"))
+  ma = hklf.reader(file_name=src).as_miller_arrays(
+    crystal_symmetry=cs)[0]
+  with open(src, "w") as f:
+    ma.expand_to_p1().export_as_shelx_hklf(f)
+
+
 def t_autosolve(suite, sample):
   method = _method()
   if not os.path.isfile(os.path.join(OV.BaseDir(), NPZ)):
@@ -93,7 +108,14 @@ def t_autosolve(suite, sample):
     raise SkipTest("no hkl with the %s sample" % sample)
   _load_model(folder, _model_file(folder))
   ref_types, ref_sg = _types(), space_group()
+  ref_no = int(olex.f("sg(%#)"))
   n_ref = sum(ref_types.values())
+  # OLEX2_TEST_AUTOSOLVE_SG=P1 solves in a lower group to measure whether the
+  # deposited one is recovered into the shortlist
+  lower = os.environ.get("OLEX2_TEST_AUTOSOLVE_SG", "").strip()
+  if lower:
+    _expand_hkl_to_p1()
+    macro("ChangeSG %s" % lower)
 
   OV.SetParam('snum.solution.program', 'olex2.solve')
   OV.SetParam('snum.solution.method', 'Auto-Solve')
@@ -134,13 +156,14 @@ def t_autosolve(suite, sample):
   entries = list(getattr(sugg, 'suggestions', []) or [])
   if not entries:
     raise AssertionError("no space-group suggestions")
-  ref_no = solver.solution_f_obs.space_group().type().number()
   numbers = [e.space_group_info.type().number() for e in entries]
   sg_rank = numbers.index(ref_no) + 1 if ref_no in numbers else 0
   if not sg_rank:
     raise AssertionError("deposited %s (No. %d) is not among the suggestions %s"
                          % (ref_sg, ref_no, numbers))
 
+  addsym = _grab(r"Possible missed symmetry: the refined model has ([^;]+), "
+                 r"solved in", text, "-", cast=lambda s: s.replace(" ", ""))
   got = _types()
   typed = sum(min(got.get(k, 0), ref_types[k]) for k in ref_types)/float(n_ref)
   if len(ref_types) > 1 and list(got) == ["C"]:
@@ -151,6 +174,7 @@ def t_autosolve(suite, sample):
                          % (_histogram(got), typed, _histogram(ref_types)))
   return " ".join("%s=%s" % kv for kv in [
     ("sg", ref_sg), ("sg_rank", sg_rank), ("n_suggest", len(entries)),
+    ("addsym", addsym),
     ("trials", trials), ("cc", "%.3f" % cc), ("peaks", peaks),
     ("geometry_changed", changed), ("allowed", allowed), ("pruned", pruned),
     ("retyped", retyped), ("atoms", sum(got.values())),
