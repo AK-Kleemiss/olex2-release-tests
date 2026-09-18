@@ -1,0 +1,8 @@
+#!/bin/bash
+# runset.sh <pass-name> <ids-file> : Auto-Solve release cases on the listed sample folders, then match + summary
+S="C:/Users/florian/AppData/Local/Temp/claude/E--Dropbox-Obsidian-LLM-Infos/ab19d726-5706-4c7b-994a-827815740ab3/scratchpad"
+name=$1; out='D:\devel\olex2-release-out\'"$name"; list=$(tr '\n' ',' < "$2" | sed 's/,$//')
+pwsh -NoProfile -Command "Get-Process olex2* -ErrorAction SilentlyContinue | Stop-Process -Force; Remove-Item D:\devel\rundir-test\runonce.release_tests.txm -ErrorAction SilentlyContinue; \$s='$list'; \$env:OLEX2_TEST_AUTOSOLVE_SAMPLES=\$s; \$cases=(\$s.Split(',') | ForEach-Object { \"autosolve_\$(\$_.ToLower())\" }) -join ','; Set-Location D:\devel\olex2-release-tests; python run_release_tests.py --olex2-dir D:\devel\rundir-test --olex2-exe D:\git\olex2\build\msvc-2026\olex2\x64\Debug\exe\olex2.exe --pythonhome C:\Users\florian\AppData\Local\Python\pythoncore-3.12-64 --salted-model E:\Model_V6 --keep-scratch --no-fetch --timeout 14400 --data-dir D:\devel\olex2-samples --cases \$cases --out-dir '$out' 2>&1 | Select-String -Pattern '^(PASS|FAIL|SKIP)' | ForEach-Object { \$_.Line.Substring(0, [Math]::Min(230, \$_.Line.Length)) }" > "$S/$name.harness.txt"
+bash "$S/matchall.sh" /d/devel/olex2-release-out/$name $(ls /d/devel/olex2-release-out/$name/scratch) > "$S/$name.match.txt" 2>&1
+awk '/^## /{if(s)print s, m, w, n; s=$2; w=0; n=0; m="-"} /matched/{m=$NF} /<-- NOISE/{n++} /<-- [A-Z][a-z]?$/{w++} END{print s, m, w, n}' "$S/$name.match.txt" > "$S/$name.summary.txt"
+awk '{split($2,a,"/"); if(a[1]>=0){M+=a[1];N+=a[2]}; W+=$3; Z+=$4} END{print "matched",M"/"N,"mistyped",W,"noise",Z}' "$S/$name.summary.txt"

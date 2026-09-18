@@ -26,6 +26,7 @@ a skip is never mistaken for a pass.
 
   OLEX2_TEST_FULL          1 registers the full-tier cases as well
   OLEX2_TEST_CASES         comma-separated case names, default all
+  OLEX2_TEST_AUTOSOLVE_SAMPLES  extra autosolve_<sample> cases beyond the four shipped
   OLEX2_TEST_SALTED_MODEL  directory holding the .salted model (read by
                            group_nsa2_matrix.t_enable)
   OLEX2_TEST_NCPUS, OLEX2_TEST_MEM, OLEX2_TEST_SAMPLE_DIR as for the matrix
@@ -669,6 +670,9 @@ CASES = [
   ("orca_ecp_malbac",        "full",  c_orca_ecp, {}),
   ("orca_qmmm_epoxide",      "full",  c_orca_qmmm, {}),
 ]
+for _s in _env_list("OLEX2_TEST_AUTOSOLVE_SAMPLES"):
+  CASES.append(("autosolve_%s" % _s.lower(), "quick", group_autosolve.t_autosolve,
+                {"sample": _s}))
 for _scheme in PARTITIONS:
   CASES.append(("part_%s_epoxide" % _scheme.lower(), "quick", c_partition,
                 {"scheme": _scheme}))
