@@ -274,6 +274,9 @@ def c_render_workflow(suite, sample, backend):
         os.remove(f)
   flags.update({"Property_ATOM": False, "Property_all_MOs": False,
                 "Property_ESP_surface": False,
+                # the phil default 0 goes out as -MO -1 and NoSpherA2 dies on it;
+                # the GUI spinner starts at 1, which is the MO_0 cube wanted above
+                "Property_MO_number": "1",
                 "map.radius": "1.0", "map.resolution": "0.5"})
   with _params(**flags):
     cubes_maps.calculate_cubes()
