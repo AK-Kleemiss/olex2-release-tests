@@ -278,6 +278,21 @@ def c_gui_refine_nosphera2(suite):
     len(REFINE_CONTROLS) - len(missing), len(REFINE_CONTROLS))
 
 
+def _assert_choices_offered(src):
+  """The method and basis the panel shows must be entries of the new
+  source's lists, or their combos render blank."""
+  from NoSpherA2.NoSpherA2 import NoSpherA2_instance as nsp2, get_functional_list
+  from NoSpherA2.utilities import source_is_tsc
+  from variableFunctions import nsa2_get_param
+  if source_is_tsc() or src == "Thakkar IAM":
+    return
+  for param, offered in (('method', get_functional_list(src)),
+                         ('basis_name', nsp2.getBasisListStr())):
+    have = nsa2_get_param(param)
+    if have not in [c.strip() for c in (offered or "").split(";")]:
+      raise AssertionError("%s shows %s=%r, not in its list %s" % (src, param, have, offered))
+
+
 def c_gui_sources(suite):
   """Choosing each wavefunction source in the combo rebuilds the panel, as
   the onchange of SNUM_REFINEMENT_NSFF_SOURCE does, without an error line;
@@ -309,6 +324,7 @@ def c_gui_sources(suite):
         raise AssertionError("choosing %r left the source at %r"
                              % (src.strip(), nsa2_get_param('source')))
       _assert_clean(log_errors(at), "source " + src.strip())
+      _assert_choices_offered(src.strip())
       dumps.add(hash(dump))
       done.append(src.strip())
   finally:

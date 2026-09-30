@@ -1,0 +1,247 @@
+#------------------------------------------------------------------------------
+#$Date: 2018-03-28 07:50:37 +0300 (Wed, 28 Mar 2018) $
+#$Revision: 207153 $
+#$URL: file:///home/coder/svn-repositories/_RELOADED_COD/cod-reloaded/cif/2/10/82/2108240.cif $
+#------------------------------------------------------------------------------
+#
+# This file is available in the Crystallography Open Database (COD),
+# http://www.crystallography.net/. The original data for this entry
+# were provided by IUCr Journals, http://journals.iucr.org/.
+#
+# The file may be used within the scientific community so long as
+# proper attribution is given to the journal article from which the
+# data were obtained.
+#
+data_2108240
+loop_
+_publ_author_name
+'Jin, Shiyun'
+'Wang, Xiaoping'
+'Xu, Huifang'
+_publ_section_title
+;
+ Revisiting the <i>I</i>{\/overline <b>1</b>} structures of
+ high-temperature Ca-rich plagioclase feldspar -- a single-crystal neutron
+ and X-ray diffraction study
+;
+_journal_coeditor_code           DK5063
+_journal_issue                   2
+_journal_name_full               'Acta Crystallographica Section B'
+_journal_page_first
+;
+;
+_journal_paper_doi               10.1107/S2052520618003219
+_journal_volume                  74
+_journal_year                    2018
+_chemical_compound_source        'Lake Superior, Minnesota'
+_chemical_formula_analytical     'An66 Ab33 Or1'
+_chemical_formula_sum            'Al1.66 Ca0.66 Na0.34 O8 Si2.34'
+_chemical_formula_weight         272.8
+_chemical_name_mineral           labradorite
+_space_group_IT_number           2
+_symmetry_cell_setting           triclinic
+_symmetry_Int_Tables_number      2
+_symmetry_space_group_name_Hall
+'-P 1 (-1/2*x+1/2*y+1/2*z,1/2*x-1/2*y+1/2*z,1/2*x+1/2*y-1/2*z)'
+_symmetry_space_group_name_H-M   'I -1'
+_cell_angle_alpha                93.5104(19)
+_cell_angle_beta                 116.124(2)
+_cell_angle_gamma                90.5297(13)
+_cell_formula_units_Z            8
+_cell_length_a                   8.1635(2)
+_cell_length_b                   12.8615(2)
+_cell_length_c                   14.1936(3)
+_cell_measurement_temperature    100
+_cell_volume                     1334.41(5)
+_diffrn_ambient_temperature      100
+_diffrn_detector                 'APEX II'
+_diffrn_measured_fraction_theta_full 0.99
+_diffrn_measured_fraction_theta_max 0.99
+_diffrn_measurement_device       'four-circle diffractometer'
+_diffrn_measurement_device_type  'Bruker CCD'
+_diffrn_radiation_monochromator  graphite
+_diffrn_radiation_probe          x-ray
+_diffrn_radiation_source         'X-ray tube'
+_diffrn_radiation_type           'Mo K\a'
+_diffrn_radiation_wavelength     0.71073
+_diffrn_reflns_av_R_equivalents  0.1249
+_diffrn_reflns_av_unetI/netI     0.0116
+_diffrn_reflns_limit_h_max       11
+_diffrn_reflns_limit_h_min       -11
+_diffrn_reflns_limit_k_max       18
+_diffrn_reflns_limit_k_min       -18
+_diffrn_reflns_limit_l_max       20
+_diffrn_reflns_limit_l_min       -20
+_diffrn_reflns_number            13059
+_diffrn_reflns_theta_full        30.54
+_diffrn_reflns_theta_max         30.54
+_diffrn_reflns_theta_min         2.17
+_diffrn_source                   'Mo Incoatec IuS 3.0 microfocus tube'
+_diffrn_source_current           0.6
+_diffrn_source_power             30
+_diffrn_source_voltage           50
+_exptl_absorpt_coefficient_mu    1.353
+_exptl_crystal_colour            grey
+_exptl_crystal_density_diffrn    2.7155
+_exptl_crystal_description       block
+_exptl_crystal_F_000             1082
+_exptl_crystal_size_max          0.181
+_exptl_crystal_size_mid          0.110
+_exptl_crystal_size_min          0.069
+_refine_diff_density_max         0.80
+_refine_diff_density_min         -0.84
+_refine_ls_extinction_method     none
+_refine_ls_goodness_of_fit_gt    2.26
+_refine_ls_goodness_of_fit_ref   2.05
+_refine_ls_number_constraints    108
+_refine_ls_number_parameters     253
+_refine_ls_number_reflns         4071
+_refine_ls_number_restraints     0
+_refine_ls_R_factor_all          0.0473
+_refine_ls_R_factor_gt           0.0399
+_refine_ls_shift/su_max          0.0094
+_refine_ls_shift/su_mean         0.0017
+_refine_ls_structure_factor_coef Fsqd
+_refine_ls_weighting_details     w=1/(\s^2^(I)+0.0016I^2^)
+_refine_ls_weighting_scheme      sigma
+_refine_ls_wR_factor_gt          0.1239
+_refine_ls_wR_factor_ref         0.1262
+_reflns_number_gt                3253
+_reflns_number_total             4071
+_reflns_threshold_expression     I>3\s(I)
+_cod_data_source_file            dk5063sup1.cif
+_cod_data_source_block           28-88_X-ray
+_cod_depositor_comments
+;
+The following automatic conversions were performed:
+
+'_diffrn_radiation_probe' value 'X-ray' changed to 'x-ray' according
+to
+/home/data/users/saulius/crontab/automatic-downloads/rss-feeds/IUCr/lib/dictionaries/cif_core.dic
+dictionary named 'cif_core.dic' version 2.4.2 from 2011-04-26.
+
+Automatic conversion script
+Id: cif_fix_values 4973 2017-02-22 13:04:09Z antanas 
+;
+_cod_original_sg_symbol_Hall     -I
+_cod_original_sg_symbol_H-M      I-1
+_cod_database_code               2108240
+loop_
+_space_group_symop_id
+_space_group_symop_operation_xyz
+1 x,y,z
+2 -x,-y,-z
+3 x+1/2,y+1/2,z+1/2
+4 -x+1/2,-y+1/2,-z+1/2
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_adp_type
+_atom_site_U_iso_or_equiv
+_atom_site_site_symmetry_multiplicity
+_atom_site_occupancy
+_atom_site_calc_flag
+Moica Ca 0.77425(15) -0.46563(9) -0.45425(9) Uani 0.0135(4) 4 0.3142 d
+Moina Na 0.77425(15) -0.46563(9) -0.45425(9) Uani 0.0135(4) 4 0.1672 d
+Mooca Ca 0.76694(16) -0.51778(12) -0.41336(10) Uani 0.0245(5) 4 0.3102 d
+Moona Na 0.76694(16) -0.51778(12) -0.41336(10) Uani 0.0245(5) 4 0.2084 d
+Mzoca Ca 0.26817(10) 0.02909(6) -0.45180(6) Uani 0.0142(3) 4 0.4968 d
+Mzona Na 0.26817(10) 0.02909(6) -0.45180(6) Uani 0.0142(3) 4 0.2546 d
+Mzica Ca 0.2642(3) 0.9868(2) -0.41625(18) Uani 0.0185(8) 4 0.1988 d
+Mzina Na 0.2642(3) 0.9868(2) -0.41625(18) Uani 0.0185(8) 4 0.0498 d
+T1oosi Si -0.50755(8) 0.33978(4) -0.60493(4) Uani 0.0074(2) 4 0.8554 d
+T1ooal Al -0.50755(8) 0.33978(4) -0.60493(4) Uani 0.0074(2) 4 0.1446 d
+T1moal Al -0.49948(8) 0.31559(4) -0.38218(4) Uani 0.0071(2) 4 0.7626 d
+T1mosi Si -0.49948(8) 0.31559(4) -0.38218(4) Uani 0.0071(2) 4 0.2373 d
+T1ozal Al 0.00416(8) 0.16431(4) -0.39014(5) Uani 0.0074(2) 4 0.7393 d
+T1ozsi Si 0.00416(8) 0.16431(4) -0.39014(5) Uani 0.0074(2) 4 0.2607 d
+T1mzsi Si 0.00471(8) 0.81715(4) -0.38660(4) Uani 0.0070(2) 4 0.8152 d
+T1mzal Al 0.00471(8) 0.81715(4) -0.38660(4) Uani 0.0070(2) 4 0.1848 d
+T2ooal Al -0.81294(8) 0.61053(4) -0.34245(5) Uani 0.0078(2) 4 0.5537 d
+T2oosi Si -0.81294(8) 0.61053(4) -0.34245(5) Uani 0.0078(2) 4 0.4463 d
+T2mosi Si -0.82224(8) 0.38077(4) -0.31944(4) Uani 0.0070(2) 4 0.7663 d
+T2moal Al -0.82224(8) 0.38077(4) -0.31944(4) Uani 0.0070(2) 4 0.2337 d
+T2ozsi Si -0.31968(8) 0.10651(4) -0.34163(4) Uani 0.0085(2) 4 0.9699 d
+T2ozal Al -0.31968(8) 0.10651(4) -0.34163(4) Uani 0.0085(2) 4 0.0302 d
+T2mzal Al -0.81769(8) 0.37635(4) -0.82310(5) Uani 0.0071(2) 4 0.6711 d
+T2mzsi Si -0.81769(8) 0.37635(4) -0.82310(5) Uani 0.0071(2) 4 0.3289 d
+Oa1o O 0.5078(2) -0.37220(12) -0.50916(11) Uani 0.0152(6) 4 1 d
+Oa1z O -0.0027(2) 0.12738(12) -0.51141(11) Uani 0.0170(6) 4 1 d
+Oa2o O 0.42148(19) 0.00929(11) -0.13935(11) Uani 0.0103(5) 4 1 d
+Oa2z O 0.57576(19) -0.00881(11) -0.36219(11) Uani 0.0104(5) 4 1 d
+Oboo O 0.3181(2) -0.39820(12) -0.40841(12) Uani 0.0152(6) 4 1 d
+Obmo O 0.1889(2) 0.14690(12) -0.12666(14) Uani 0.0216(7) 4 1 d
+Oboz O 0.1952(2) -0.10203(12) -0.59465(13) Uani 0.0160(6) 4 1 d
+Obmz O 0.1812(2) 0.14634(12) -0.61646(14) Uani 0.0207(7) 4 1 d
+Ocoo O 0.5121(2) -0.21662(12) -0.36257(11) Uani 0.0135(6) 4 1 d
+Ocmo O 0.4896(2) -0.18258(12) -0.60772(11) Uani 0.0143(5) 4 1 d
+Ocoz O 0.4862(2) 0.20643(12) -0.14593(11) Uani 0.0130(5) 4 1 d
+Ocmz O -0.0105(2) 0.30937(12) -0.60183(11) Uani 0.0150(6) 4 1 d
+Odoo O 0.8067(2) -0.10720(11) -0.18947(12) Uani 0.0139(5) 4 1 d
+Odmo O 0.1955(2) -0.13216(12) -0.78220(12) Uani 0.0180(6) 4 1 d
+Odoz O 0.2024(2) 0.10477(11) -0.30847(12) Uani 0.0152(5) 4 1 d
+Odmz O -0.1860(2) 0.13696(13) -0.71421(13) Uani 0.0204(6) 4 1 d
+loop_
+_atom_site_aniso_label
+_atom_site_aniso_type_symbol
+_atom_site_aniso_U_11
+_atom_site_aniso_U_22
+_atom_site_aniso_U_33
+_atom_site_aniso_U_12
+_atom_site_aniso_U_13
+_atom_site_aniso_U_23
+Moica Ca 0.0097(5) 0.0153(5) 0.0122(6) 0.0032(4) 0.0023(4) -0.0031(4)
+Moina Na 0.0097(5) 0.0153(5) 0.0122(6) 0.0032(4) 0.0023(4) -0.0031(4)
+Mooca Ca 0.0096(5) 0.0451(8) 0.0171(6) -0.0084(5) 0.0068(5) -0.0170(6)
+Moona Na 0.0096(5) 0.0451(8) 0.0171(6) -0.0084(5) 0.0068(5) -0.0170(6)
+Mzoca Ca 0.0075(3) 0.0183(4) 0.0120(4) 0.0032(3) 0.0009(3) -0.0061(3)
+Mzona Na 0.0075(3) 0.0183(4) 0.0120(4) 0.0032(3) 0.0009(3) -0.0061(3)
+Mzica Ca 0.0092(10) 0.0437(15) 0.0047(10) -0.0071(10) 0.0058(8) -0.0039(10)
+Mzina Na 0.0092(10) 0.0437(15) 0.0047(10) -0.0071(10) 0.0058(8) -0.0039(10)
+T1oosi Si 0.0082(3) 0.0085(3) 0.0050(3) -0.0022(2) 0.0024(2) 0.0016(2)
+T1ooal Al 0.0082(3) 0.0085(3) 0.0050(3) -0.0022(2) 0.0024(2) 0.0016(2)
+T1moal Al 0.0082(3) 0.0084(3) 0.0040(3) 0.0025(2) 0.0019(2) 0.0011(2)
+T1mosi Si 0.0082(3) 0.0084(3) 0.0040(3) 0.0025(2) 0.0019(2) 0.0011(2)
+T1ozal Al 0.0081(3) 0.0078(3) 0.0057(3) -0.0021(2) 0.0024(2) 0.0018(2)
+T1ozsi Si 0.0081(3) 0.0078(3) 0.0057(3) -0.0021(2) 0.0024(2) 0.0018(2)
+T1mzsi Si 0.0080(3) 0.0085(3) 0.0038(3) 0.0025(2) 0.0018(2) 0.0014(2)
+T1mzal Al 0.0080(3) 0.0085(3) 0.0038(3) 0.0025(2) 0.0018(2) 0.0014(2)
+T2ooal Al 0.0080(3) 0.0058(3) 0.0085(3) 0.0003(2) 0.0023(2) 0.0017(2)
+T2oosi Si 0.0080(3) 0.0058(3) 0.0085(3) 0.0003(2) 0.0023(2) 0.0017(2)
+T2mosi Si 0.0071(3) 0.0047(3) 0.0076(3) 0.0002(2) 0.0015(2) 0.0023(2)
+T2moal Al 0.0071(3) 0.0047(3) 0.0076(3) 0.0002(2) 0.0015(2) 0.0023(2)
+T2ozsi Si 0.0085(3) 0.0059(2) 0.0094(3) 0.0001(2) 0.0025(2) 0.0006(2)
+T2ozal Al 0.0085(3) 0.0059(2) 0.0094(3) 0.0001(2) 0.0025(2) 0.0006(2)
+T2mzal Al 0.0071(3) 0.0068(3) 0.0068(3) -0.0002(2) 0.0024(2) 0.0023(2)
+T2mzsi Si 0.0071(3) 0.0068(3) 0.0068(3) -0.0002(2) 0.0024(2) 0.0023(2)
+Oa1o O 0.0226(9) 0.0175(8) 0.0070(7) 0.0005(6) 0.0078(7) 0.0017(6)
+Oa1z O 0.0276(9) 0.0204(8) 0.0065(7) 0.0040(7) 0.0100(7) 0.0048(6)
+Oa2o O 0.0111(7) 0.0093(6) 0.0095(7) 0.0007(5) 0.0033(6) 0.0041(5)
+Oa2z O 0.0114(7) 0.0086(6) 0.0094(7) -0.0018(5) 0.0027(6) 0.0015(5)
+Oboo O 0.0152(8) 0.0116(7) 0.0201(8) -0.0031(6) 0.0093(7) -0.0005(6)
+Obmo O 0.0173(8) 0.0150(8) 0.0365(10) -0.0020(6) 0.0163(8) -0.0050(7)
+Oboz O 0.0172(8) 0.0110(7) 0.0234(9) -0.0010(6) 0.0122(7) 0.0001(6)
+Obmz O 0.0157(8) 0.0172(8) 0.0324(10) 0.0007(6) 0.0139(8) -0.0024(7)
+Ocoo O 0.0141(7) 0.0137(7) 0.0120(8) -0.0028(6) 0.0053(6) 0.0016(6)
+Ocmo O 0.0121(7) 0.0166(7) 0.0101(7) 0.0053(6) 0.0011(6) -0.0006(6)
+Ocoz O 0.0133(7) 0.0123(7) 0.0108(7) -0.0038(6) 0.0029(6) 0.0017(6)
+Ocmz O 0.0172(8) 0.0127(7) 0.0101(7) 0.0043(6) 0.0018(6) -0.0014(6)
+Odoo O 0.0134(7) 0.0121(7) 0.0101(7) -0.0002(6) -0.0004(6) 0.0022(6)
+Odmo O 0.0147(8) 0.0148(7) 0.0141(8) 0.0020(6) -0.0025(6) -0.0034(6)
+Odoz O 0.0155(8) 0.0112(7) 0.0105(7) -0.0008(6) -0.0020(6) 0.0019(6)
+Odmz O 0.0169(8) 0.0178(8) 0.0145(8) 0.0032(6) -0.0037(7) -0.0025(6)
+loop_
+_atom_type_symbol
+_atom_type_scat_dispersion_real
+_atom_type_scat_dispersion_imag
+_atom_type_scat_source
+Al 0.0645 0.0514 'International Tables Vol C tables 4.2.6.8 and 6.1.1.1'
+Ca 0.2262 0.3064 'International Tables Vol C tables 4.2.6.8 and 6.1.1.1'
+Na 0.0362 0.0249 'International Tables Vol C tables 4.2.6.8 and 6.1.1.1'
+O 0.0106 0.0060 'International Tables Vol C tables 4.2.6.8 and 6.1.1.1'
+Si 0.0817 0.0704 'International Tables Vol C tables 4.2.6.8 and 6.1.1.1'
+
+_cod_database_fobs_code 2108240

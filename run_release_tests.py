@@ -170,11 +170,11 @@ def prepare_out(args):
                                      or name.startswith("olex2")):
             os.remove(path)
     # nothing is refined inside the repository: the cases copy from here.
-    # An autosolve-only --cases run stages just its own samples: the whole
+    # A flint-only --cases run stages just its own samples: the whole
     # set is 1 GB per out-dir, and a sweep makes hundreds of out-dirs
     only = [c.strip() for c in (args.cases or "").split(",") if c.strip()]
-    if only and all(c.startswith("autosolve_") for c in only):
-        only = set(c[len("autosolve_"):] for c in only)
+    if only and all(c.startswith("flint_") for c in only):
+        only = set(c[len("flint_"):] for c in only)
     else:
         only = None
     for name in sorted(os.listdir(args.data_dir)):
@@ -335,8 +335,12 @@ def write_gui_index(out):
     if not os.path.isdir(d):
         return None
     shots = sorted(f for f in os.listdir(d) if f.endswith(".png"))
-    rows = ["<h2>%s</h2><img src='%s' style='max-width:100%%;border:1px solid #888'>"
-            "<p><a href='%s.html'>html tree</a></p>" % (s[:-4], s, s[:-4]) for s in shots]
+    rows = []
+    for s in shots:
+        rows.append("<h2>%s</h2><img src='%s' style='max-width:100%%;border:1px solid #888'>"
+                    % (s[:-4], s))
+        if os.path.isfile(os.path.join(d, s[:-4] + ".html")):  # the render cases dump no panel
+            rows.append("<p><a href='%s.html'>html tree</a></p>" % s[:-4])
     write_text(os.path.join(d, "index.html"),
                "<html><body style='font-family:sans-serif'>%s</body></html>\n" % "\n".join(rows))
     return d, len(shots)

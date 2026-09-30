@@ -6,12 +6,17 @@ for p in sys.argv[1:]:
   for l in lines:
     t = l.split()
     if not t: continue
-    if t[0] == 'loop_': inloop, cols = True, []; continue
+    if t[0] == 'loop_':
+      if rows: break  # a later loop (embedded CIF) would reset the columns
+      inloop, cols = True, []; continue
     if inloop and t[0].startswith('_refln'): cols.append(t[0]); continue
     if inloop and cols and not t[0].startswith('_') and len(t) >= len(cols): rows.append(t)
     elif inloop and cols and t[0].startswith('_'): inloop = False
   h, k, l = (cols.index('_refln_index_' + x) for x in 'hkl')
-  f = cols.index('_refln_F_squared_meas'); s = cols.index('_refln_F_squared_sigma')
+  sq = '_refln_F_squared_meas' in cols
+  f = cols.index('_refln_F_squared_meas' if sq else '_refln_F_meas'); s = cols.index('_refln_F_squared_sigma' if sq else '_refln_F_sigma')
+  if not sq:  # an F loop: F^2 and sigma(F^2) = 2 F sigma(F)
+    for r in rows: F, S = float(r[f]), float(r[s]); r[f], r[s] = str(F*F), str(2*abs(F)*S)
   shutil.copy(p, p[:-4] + '.fcf')
   # one common scale keeps every value inside the 8-character HKLF 4 field
   scale = 1.0

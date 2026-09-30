@@ -7,6 +7,8 @@ Sample structures in sample_data/
   ZP2       Olex2 sample_data (OlexSys Ltd), redistributed for testing
   malbac    structure from Olex2 sample_data (OlexSys Ltd); reflection file
             from the NoSpherA2 test set (tests/ECP_SF)
+  cod_*     Crystallography Open Database (crystallography.net) entries
+            of that number, cif and hkl; COD data are in the public domain
 
 The scripts in this repository (run_release_tests.py, compare_golden.py) are
 released under the BSD-2-Clause license, see LICENSE.

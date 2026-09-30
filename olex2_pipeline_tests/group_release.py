@@ -13,7 +13,9 @@ within 0.0005).
       Pd complex, SALTED Model_V6 (model not shipped: SKIP without it),
       discambMATTS and the "Get discambMATTS" entry when the exe is missing,
       four partitionings, XCW with two lambda steps and its GUI block, the
-      grown asymmetric unit (water, Mn(II)), properties as cube files, the
+      grown asymmetric unit (water, Mn(II)), properties as cube files, a
+      two-domain HKLF 5 twin and the same as HKLF 4 + TWIN card (epoxide,
+      synthetic, BASF and -twin), the
       Hybrid mode on ZP2 (molecule 1 as PART 1, molecule 2 as PART 2) with
       discambMATTS and pTB.
   full tier (OLEX2_TEST_FULL=1, needs ORCA): the quick tier plus ORCA on an
@@ -26,7 +28,8 @@ a skip is never mistaken for a pass.
 
   OLEX2_TEST_FULL          1 registers the full-tier cases as well
   OLEX2_TEST_CASES         comma-separated case names, default all
-  OLEX2_TEST_AUTOSOLVE_SAMPLES  extra autosolve_<sample> cases beyond the four shipped
+  OLEX2_TEST_FLINT_SAMPLES  extra flint_<sample> cases beyond the four shipped
+                           and the eight carbon-free cod_<id> ones (group_flint.INORGANIC)
   OLEX2_TEST_SALTED_MODEL  directory holding the .salted model (read by
                            group_nsa2_matrix.t_enable)
   OLEX2_TEST_NCPUS, OLEX2_TEST_MEM, OLEX2_TEST_SAMPLE_DIR as for the matrix
@@ -36,6 +39,7 @@ from __future__ import absolute_import, division, print_function
 import glob
 import os
 import shutil
+import struct
 import time
 
 import olx
@@ -49,7 +53,7 @@ import group_nsa2_matrix as matrix
 from group_nsa2_matrix import (SAMPLES, _prepare, _set_aspherical,
                                _defaults_for, _aspherical_run, _check_moved)
 import group_nosphera2 as base
-import group_autosolve
+import group_flint
 from group_nosphera2 import (_source_name, _refine_capturing, _reason)
 
 GROUP = "release"
@@ -463,6 +467,116 @@ def c_grown(suite):
                      ("multiplicity", SAMPLES["water"][1])]))
 
 
+HKLF5_LAW = ((1, 0, 0), (0, -1, 0), (0, 0, -1))   # a twofold about a: pseudo-merohedral in P2(1)/c
+
+
+def _write_hklf5(hkl, law, fraction=0.2, batches=True):
+  """Rewrite an HKLF 4 file (monoclinic, merged) as two-component HKLF 5: every reflection whose
+  image under the law was measured becomes an overlapped pair (its image on a
+  batch -2 line, itself on the batch 1 line that closes the group) with the
+  image's intensity mixed in. Synthetic, so it tests the plumbing, not the
+  physics. Returns how many reflections were paired. batches=False keeps the
+  file HKLF 4 with the same contamination, the case for a TWIN card."""
+  rows = []
+  for line in open(hkl):
+    if len(line) < 28:
+      break
+    h, k, l = int(line[0:4]), int(line[4:8]), int(line[8:12])
+    if (h, k, l) == (0, 0, 0):
+      break
+    rows.append(((h, k, l), float(line[12:20]), float(line[20:28])))
+  # merged data: the image is stored under one of its 2/m equivalents
+  data = {}
+  for (h, k, l), i, s in rows:
+    for eq in ((h, k, l), (-h, k, -l), (-h, -k, -l), (h, -k, l)):
+      data.setdefault(eq, (i, s))
+  out, paired = [], 0
+  for hkl_, i, s in rows:
+    image = tuple(sum(law[r][c] * hkl_[c] for c in range(3)) for r in range(3))
+    if image in data and image != hkl_:
+      # the group's one observation is read from the closing line
+      i2, s2 = data[image]
+      if batches:
+        out.append("%4d%4d%4d%8.2f%8.2f%4d" % (image + (0.0, 0.0, -2)))
+      i, s = (1 - fraction) * i + fraction * i2, (s * s + (fraction * s2) ** 2) ** 0.5
+      paired += 1
+    out.append("%4d%4d%4d%8.2f%8.2f" % (hkl_ + (i, s)) + ("%4d" % 1 if batches else ""))
+  out.append("%4d%4d%4d%8.2f%8.2f" % (0, 0, 0, 0, 0) + ("%4d" % 0 if batches else ""))
+  open(hkl, "w").write("\n".join(out) + "\n")
+  return paired
+
+
+def c_hklf5(suite):
+  """Non-merohedral twin data (HKLF 5 with batch numbers) through the whole
+  route: BASF refines, the law read off the file reaches NoSpherA2 as -twin,
+  the table covers the second domain, the aspherical cycle runs."""
+  source = _source_name("pTB")
+  folder = matrix.sample_copy(suite, "epoxide")
+  hkl = [os.path.join(folder, f) for f in os.listdir(folder) if f.lower().endswith(".hkl")][0]
+  paired = _write_hklf5(hkl, HKLF5_LAW)
+  if paired < 100:
+    raise AssertionError("only %d reflections have a measured twin image" % paired)
+  matrix._load_model(folder, matrix._model_file(folder))
+  macro("AddIns HKLF 5")
+  macro("AddIns BASF 0.2")
+  macro("file")
+  OV.SetParam('snum.refinement.update_weight', False)
+  clear_r1()
+  base._refine_spherically()
+  r_sph = r1_of_last_refinement()
+  model = OV.GetRefinementModel(False)
+  if model['hklf']['value'] != 5:
+    raise AssertionError("the model reports HKLF %s after the spherical refinement" % model['hklf']['value'])
+  basf = [float(b) for b in model['hklf'].get('basf', [])]
+  if not basf or not 0.0 < basf[0] < 1.0:
+    raise AssertionError("BASF did not refine to a fraction: %r" % basf)
+  _set_aspherical("epoxide", source)
+  cycles, tsc, said = _aspherical_run("epoxide", "pTB", source, folder)
+  r_asp = r1_of_last_refinement()
+  _check_moved("pTB", r_sph, r_asp)
+  from cctbx_olex_adapter import get_table_fallback_atoms
+  if get_table_fallback_atoms():
+    raise AssertionError("atoms refined spherically beside the table: %s" % get_table_fallback_atoms())
+  return _facts(*(_r1_facts(tsc, cycles, r_sph, r_asp)
+                  + [("paired", paired), ("basf", "%.3f" % basf[0])]))
+
+
+def c_twin_hklf4(suite):
+  """Merohedral twin as SHELX writes it: HKLF 4 data with a TWIN card and BASF.
+  The law (and its powers) reach NoSpherA2 as -twin, so the table covers R h
+  and the aspherical cycle runs."""
+  source = _source_name("pTB")
+  folder = matrix.sample_copy(suite, "epoxide")
+  hkl = [os.path.join(folder, f) for f in os.listdir(folder) if f.lower().endswith(".hkl")][0]
+  paired = _write_hklf5(hkl, HKLF5_LAW, batches=False)
+  if paired < 100:
+    raise AssertionError("only %d reflections have a measured twin image" % paired)
+  matrix._load_model(folder, matrix._model_file(folder))
+  macro("AddIns TWIN %s 2" % " ".join(str(x) for row in HKLF5_LAW for x in row))
+  macro("AddIns BASF 0.2")
+  macro("file")
+  OV.SetParam('snum.refinement.update_weight', False)
+  clear_r1()
+  base._refine_spherically()
+  r_sph = r1_of_last_refinement()
+  model = OV.GetRefinementModel(False)
+  if model['hklf']['value'] != 4 or 'twin' not in model:
+    raise AssertionError("expected HKLF 4 with a TWIN card, got HKLF %s, twin %r"
+                         % (model['hklf']['value'], model.get('twin')))
+  basf = [float(b) for b in model['twin'].get('basf', [])]
+  if not basf or not 0.0 < basf[0] < 1.0:
+    raise AssertionError("BASF did not refine to a fraction: %r" % basf)
+  _set_aspherical("epoxide", source)
+  cycles, tsc, said = _aspherical_run("epoxide", "pTB", source, folder)
+  r_asp = r1_of_last_refinement()
+  _check_moved("pTB", r_sph, r_asp)
+  from cctbx_olex_adapter import get_table_fallback_atoms
+  if get_table_fallback_atoms():
+    raise AssertionError("atoms refined spherically beside the table: %s" % get_table_fallback_atoms())
+  return _facts(*(_r1_facts(tsc, cycles, r_sph, r_asp)
+                  + [("paired", paired), ("basf", "%.3f" % basf[0])]))
+
+
 def c_orca_qmmm(suite):
   """ORCA inside the crystal field (MOL-CRYSTAL-QMMM), the embedded route."""
   source = _source_name("ORCA")
@@ -584,12 +698,45 @@ def c_hybrid(suite, part1, part2):
 
 
 def _cube_dims(path):
+  # NoSpherA2 writes binary .cubeb since 21 Sep 2026: magic, version, offset, na, size[3]
+  with open(path, "rb") as f:
+    if f.read(8) == b"NSA2CUBE":
+      f.read(8)
+      na, nx, ny, nz = struct.unpack("<4i", f.read(16))
+      return abs(na), [nx, ny, nz]
   lines = open(path, errors="ignore").read().splitlines()
   if len(lines) < 7:
     raise AssertionError("%s is not a cube file" % os.path.basename(path))
   natoms = abs(int(lines[2].split()[0]))
   dims = [int(lines[i].split()[0]) for i in (3, 4, 5)]
   return natoms, dims
+
+
+def _settle(cubes, timeout=CUBE_TIMEOUT):
+  """Wait for a properties run to finish: calculate_cubes does not wait, so a
+  cube is done only once it is on disk and has stopped growing. Hands back the
+  paths with the .cubeb NoSpherA2 writes resolved."""
+  log = os.path.join(os.path.dirname(cubes[0]), "NoSpherA2_cube.log")
+  t0 = time.time()
+  sizes = {}
+  while True:
+    done = True
+    cubes = [c + "b" if os.path.isfile(c + "b") else c for c in cubes]
+    for c in cubes:
+      size = os.path.getsize(c) if os.path.isfile(c) else -1
+      if size <= 0 or sizes.get(c) != size:
+        done = False
+      sizes[c] = size
+    if done:
+      return cubes
+    if time.time() - t0 > timeout:
+      tail = ""
+      if os.path.isfile(log):
+        tail = " - log: " + " | ".join(open(log, errors="ignore").read().splitlines()[-3:])
+      missing = [os.path.basename(c) for c in cubes if not os.path.isfile(c)]
+      raise AssertionError("cubes not written within %.0f s (missing %s)%s"
+                           % (timeout, ", ".join(missing) or "none, still growing", tail))
+    time.sleep(2.0)
 
 
 def c_cubes(suite):
@@ -606,36 +753,19 @@ def c_cubes(suite):
       raise AssertionError("pTB left no %s.xtb beside the model or in the job folder" % name)
     shutil.copy(inner, wfn)
   wanted = ["lap", "eli", "def"]
-  cubes = [os.path.join(folder, "%s_%s.cube" % (name, w)) for w in wanted]
+  # products live where cubes_maps puts them (olex2/NoSpherA2/<key>/<wfn key>/ since 21 Sep 2026), as .cubeb
+  cubes = [cubes_maps._p("%s_%s.cube" % (name, w)) for w in wanted]
   for c in cubes:
-    if os.path.isfile(c):
-      os.remove(c)
+    for f in (c, c + "b"):
+      if os.path.isfile(f):
+        os.remove(f)
   os.chdir(folder)
   with _params(**{"Property_Lap": True, "Property_Eli": True, "Property_DEF": True,
                   "Property_Elf": False, "Property_RDG": False, "Property_ESP": False,
                   "Property_MO": False, "Property_ATOM": False, "Property_all_MOs": False,
                   "map.radius": "1.0", "map.resolution": "0.5"}):
     cubes_maps.calculate_cubes()
-  log = os.path.join(folder, "NoSpherA2_cube.log")
-  t0 = time.time()
-  sizes = {}
-  while True:
-    done = True
-    for c in cubes:
-      size = os.path.getsize(c) if os.path.isfile(c) else -1
-      if size <= 0 or sizes.get(c) != size:
-        done = False
-      sizes[c] = size
-    if done:
-      break
-    if time.time() - t0 > CUBE_TIMEOUT:
-      tail = ""
-      if os.path.isfile(log):
-        tail = " - log: " + " | ".join(open(log, errors="ignore").read().splitlines()[-3:])
-      missing = [os.path.basename(c) for c in cubes if not os.path.isfile(c)]
-      raise AssertionError("cubes not written within %.0f s (missing %s)%s"
-                           % (CUBE_TIMEOUT, ", ".join(missing) or "none, still growing", tail))
-    time.sleep(2.0)
+  cubes = _settle(cubes)
   natoms, dims = _cube_dims(cubes[0])
   for c in cubes[1:]:
     n2, d2 = _cube_dims(c)
@@ -662,16 +792,26 @@ CASES = [
   ("xcw_epoxide",            "quick", c_xcw, {}),
   ("grown_water_ptb",        "quick", c_grown, {}),
   ("cubes_epoxide_ptb",      "quick", c_cubes, {}),
-  ("autosolve_sucrose",      "quick", group_autosolve.t_autosolve, {"sample": "sucrose"}),
-  ("autosolve_epoxide",      "quick", group_autosolve.t_autosolve, {"sample": "epoxide"}),
-  ("autosolve_water",        "quick", group_autosolve.t_autosolve, {"sample": "water"}),
-  ("autosolve_malbac",       "quick", group_autosolve.t_autosolve, {"sample": "malbac"}),
+  ("hklf5_epoxide_ptb",      "quick", c_hklf5, {}),
+  ("twin_hklf4_epoxide_ptb", "quick", c_twin_hklf4, {}),
+  ("flint_sucrose",      "quick", group_flint.t_flint, {"sample": "sucrose"}),
+  ("flint_epoxide",      "quick", group_flint.t_flint, {"sample": "epoxide"}),
+  ("flint_water",        "quick", group_flint.t_flint, {"sample": "water"}),
+  ("flint_malbac",       "quick", group_flint.t_flint, {"sample": "malbac"}),
+  ("flint_cod_1560875",  "quick", group_flint.t_flint, {"sample": "cod_1560875"}),
+  ("flint_cod_2241658",  "quick", group_flint.t_flint, {"sample": "cod_2241658"}),
+  ("flint_cod_2108240",  "quick", group_flint.t_flint, {"sample": "cod_2108240"}),
+  ("flint_cod_2013004",  "quick", group_flint.t_flint, {"sample": "cod_2013004"}),
+  ("flint_cod_2104335",  "quick", group_flint.t_flint, {"sample": "cod_2104335"}),
+  ("flint_cod_2208447",  "quick", group_flint.t_flint, {"sample": "cod_2208447"}),
+  ("flint_cod_2229150",  "quick", group_flint.t_flint, {"sample": "cod_2229150"}),
+  ("flint_cod_2108989",  "quick", group_flint.t_flint, {"sample": "cod_2108989"}),
   ("orca_epoxide",           "full",  c_orca, {}),
   ("orca_ecp_malbac",        "full",  c_orca_ecp, {}),
   ("orca_qmmm_epoxide",      "full",  c_orca_qmmm, {}),
 ]
-for _s in _env_list("OLEX2_TEST_AUTOSOLVE_SAMPLES"):
-  CASES.append(("autosolve_%s" % _s.lower(), "quick", group_autosolve.t_autosolve,
+for _s in _env_list("OLEX2_TEST_FLINT_SAMPLES"):
+  CASES.append(("flint_%s" % _s.lower(), "quick", group_flint.t_flint,
                 {"sample": _s}))
 for _scheme in PARTITIONS:
   CASES.append(("part_%s_epoxide" % _scheme.lower(), "quick", c_partition,
@@ -682,6 +822,9 @@ for _p1, _p2, _tier in HYBRID_COMBOS:
 for _method, _basis in OCC_METHOD_BASIS:
   CASES.append(("occ_%s_%s_epoxide" % (_method.lower(), _basis), "quick", c_occ,
                 {"method": _method, "basis": _basis}))
+# pictures of the 3D view, each from a camera matr fixed
+import render_tests
+CASES += render_tests.CASES
 # the GUI layer: the panels first, on a fresh window, and the log check last
 # so it covers everything the refinements printed as well
 import gui_tests

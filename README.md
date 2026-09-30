@@ -28,7 +28,7 @@ comparer, sample structures and goldens.
 | `grown_water_ptb` | refinement on a grown asymmetric unit (Z' = 0.5, multiplicity 6) | quick |
 | `cubes_epoxide_ptb` | property cubes (Laplacian, ELI, deformation density) | quick |
 | `hybrid_zp2_discamb_ptb` | Hybrid mode, PART 1 = discambMATTS, PART 2 = pTB, tables merged | quick |
-| `autosolve_sucrose`, `autosolve_epoxide`, `autosolve_water`, `autosolve_malbac` | Auto-Solve: multi-trial charge flipping, space-group shortlist, density + geometry element assignment (needs `etc/geometry_aid_model.npz`), ADP prune, re-typing after cleanup | quick |
+| `flint_sucrose`, `flint_epoxide`, `flint_water`, `flint_malbac` | FLINT: multi-trial charge flipping, space-group shortlist, density + geometry element assignment (needs `etc/geometry_aid_model.npz`), ADP prune, re-typing after cleanup | quick |
 | `orca_epoxide` | ORCA B3LYP/def2-SVP | full |
 | `orca_ecp_malbac` | ORCA with an ECP basis, ECP electrons counted | full |
 | `orca_qmmm_epoxide` | embedded (MOL-CRYSTAL-QMMM) ORCA | full |
@@ -88,5 +88,7 @@ present; none is needed so far.
 
 `sample_data/` holds small structures with reflections: `epoxide` (NoSpherA2
 test set), `sucrose`, `water`, `ZP2` (Olex2 `sample_data`), `malbac` (Olex2
-`sample_data` structure, reflections from the NoSpherA2 test set). See
-`NOTICE`.
+`sample_data` structure, reflections from the NoSpherA2 test set), and the
+eight carbon-free `cod_<id>` entries of the flint group's inorganic
+subsection (Crystallography Open Database; `OLEX2_TEST_FLINT_SAMPLES=inorganic`
+runs only those). See `NOTICE`.

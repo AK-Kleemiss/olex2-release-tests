@@ -1,0 +1,237 @@
+#------------------------------------------------------------------------------
+#$Date: 2016-02-20 05:06:23 +0200 (Sat, 20 Feb 2016) $
+#$Revision: 176774 $
+#$URL: file:///home/coder/svn-repositories/_RELOADED_COD/cod-reloaded/cif/2/20/84/2208447.cif $
+#------------------------------------------------------------------------------
+#
+# This file is available in the Crystallography Open Database (COD),
+# http://www.crystallography.net/. The original data for this entry
+# were provided by IUCr Journals, http://journals.iucr.org/.
+#
+# The file may be used within the scientific community so long as
+# proper attribution is given to the journal article from which the
+# data were obtained.
+#
+data_2208447
+loop_
+_publ_author_name
+'Tobias van Almsick'
+'William S. Sheldrick'
+_publ_section_title
+;
+ Tetracaesium octaselenidotetraarsenate(III)
+;
+_journal_coeditor_code           WM6134
+_journal_issue                   3
+_journal_name_full               'Acta Crystallographica Section E'
+_journal_page_first              i41
+_journal_page_last               i43
+_journal_paper_doi               10.1107/S1600536806003898
+_journal_volume                  62
+_journal_year                    2006
+_chemical_formula_iupac          'Cs4 As4 Se8'
+_chemical_formula_structural     'Cs4 (As4 Se8)'
+_chemical_formula_sum            'As4 Cs4 Se8'
+_chemical_formula_weight         1463.00
+_chemical_name_systematic
+;
+Tetracaesium octaselenidotetraarsenat(III)
+;
+_space_group_IT_number           14
+_symmetry_cell_setting           monoclinic
+_symmetry_space_group_name_Hall  '-P 2yn'
+_symmetry_space_group_name_H-M   'P 1 21/n 1'
+_atom_sites_solution_primary     direct
+_atom_sites_solution_secondary   difmap
+_audit_creation_method           SHELXL97
+_cell_angle_alpha                90.00
+_cell_angle_beta                 103.51(2)
+_cell_angle_gamma                90.00
+_cell_formula_units_Z            2
+_cell_length_a                   7.1572(13)
+_cell_length_b                   14.862(3)
+_cell_length_c                   10.515(4)
+_cell_measurement_reflns_used    24
+_cell_measurement_temperature    292(2)
+_cell_measurement_theta_max      17.25
+_cell_measurement_theta_min      5.12
+_cell_volume                     1087.5(5)
+_computing_cell_refinement       'R3m/V Software'
+_computing_data_collection       'R3m/V Software (Siemens, 1989)'
+_computing_data_reduction        'XDISK (Siemens, 1989)'
+_computing_molecular_graphics    'SHELXTL (Sheldrick, 1995)'
+_computing_publication_material  SHELXL97
+_computing_structure_refinement  'SHELXL97 (Sheldrick, 1997)'
+_computing_structure_solution    'SHELXS97 (Sheldrick, 1997)'
+_diffrn_ambient_temperature      292(2)
+_diffrn_measured_fraction_theta_full 0.993
+_diffrn_measured_fraction_theta_max 0.993
+_diffrn_measurement_device_type  'Siemens P4 four-circle'
+_diffrn_measurement_method       \w
+_diffrn_radiation_monochromator  graphite
+_diffrn_radiation_source         'fine-focus sealed tube'
+_diffrn_radiation_type           MoK\a
+_diffrn_radiation_wavelength     0.71073
+_diffrn_reflns_av_R_equivalents  0.0368
+_diffrn_reflns_av_sigmaI/netI    0.0398
+_diffrn_reflns_limit_h_max       8
+_diffrn_reflns_limit_h_min       -1
+_diffrn_reflns_limit_k_max       17
+_diffrn_reflns_limit_k_min       -1
+_diffrn_reflns_limit_l_max       12
+_diffrn_reflns_limit_l_min       -12
+_diffrn_reflns_number            2600
+_diffrn_reflns_theta_full        25.00
+_diffrn_reflns_theta_max         25.00
+_diffrn_reflns_theta_min         2.42
+_diffrn_standards_decay_%        0.05
+_diffrn_standards_interval_count 97
+_diffrn_standards_number         3
+_exptl_absorpt_coefficient_mu    26.056
+_exptl_absorpt_correction_T_max  0.092
+_exptl_absorpt_correction_T_min  0.054
+_exptl_absorpt_correction_type   psi-scan
+_exptl_absorpt_process_details   '(XPREP in SHELXTL; Sheldrick, 1995)'
+_exptl_crystal_colour            red
+_exptl_crystal_density_diffrn    4.468
+_exptl_crystal_density_method    'not measured'
+_exptl_crystal_description       prism
+_exptl_crystal_F_000             1248
+_exptl_crystal_size_max          0.12
+_exptl_crystal_size_mid          0.11
+_exptl_crystal_size_min          0.09
+_refine_diff_density_max         1.277
+_refine_diff_density_min         -1.232
+_refine_ls_extinction_method     none
+_refine_ls_goodness_of_fit_ref   1.017
+_refine_ls_matrix_type           full
+_refine_ls_number_parameters     73
+_refine_ls_number_reflns         1916
+_refine_ls_number_restraints     0
+_refine_ls_restrained_S_all      1.017
+_refine_ls_R_factor_all          0.0482
+_refine_ls_R_factor_gt           0.0367
+_refine_ls_shift/su_max          0.000
+_refine_ls_shift/su_mean         0.000
+_refine_ls_structure_factor_coef Fsqd
+_refine_ls_weighting_details
+'w = 1/[\s^2^(Fo^2^)+(0.0697P)^2^] where P=(Fo^2^+2Fc^2^)/3'
+_refine_ls_weighting_scheme      calc
+_refine_ls_wR_factor_gt          0.0946
+_refine_ls_wR_factor_ref         0.0993
+_reflns_number_gt                1594
+_reflns_number_total             1916
+_reflns_threshold_expression     I>2\s(I)
+_cod_data_source_file            wm6134.cif
+_cod_data_source_block           I
+_cod_original_sg_symbol_H-M      'P 21/n'
+_cod_database_code               2208447
+_cod_database_fobs_code          2208447
+loop_
+_symmetry_equiv_pos_as_xyz
+'x, y, z'
+'-x+1/2, y+1/2, -z+1/2'
+'-x, -y, -z'
+'x-1/2, -y-1/2, z-1/2'
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_U_iso_or_equiv
+_atom_site_adp_type
+_atom_site_calc_flag
+_atom_site_occupancy
+_atom_site_type_symbol
+Cs1 0.85765(9) 0.29650(4) 0.54437(6) 0.0281(2) Uani d 1 Cs
+Cs2 0.27440(9) 0.60646(4) 0.06525(6) 0.0303(2) Uani d 1 Cs
+Se1 0.53222(14) 0.39975(6) 0.25300(9) 0.0247(2) Uani d 1 Se
+Se21 0.06135(14) 0.32341(6) 0.24246(9) 0.0245(2) Uani d 1 Se
+Se2 0.62602(14) 0.62158(6) 0.43672(9) 0.0230(2) Uani d 1 Se
+Se11 0.81064(14) 0.59227(7) 0.14932(10) 0.0257(2) Uani d 1 Se
+As1 0.79060(13) 0.51023(6) 0.33216(8) 0.0184(2) Uani d 1 As
+As2 0.25976(13) 0.43913(6) 0.34317(9) 0.0194(2) Uani d 1 As
+loop_
+_atom_site_aniso_label
+_atom_site_aniso_U_11
+_atom_site_aniso_U_22
+_atom_site_aniso_U_33
+_atom_site_aniso_U_12
+_atom_site_aniso_U_13
+_atom_site_aniso_U_23
+Cs1 0.0284(4) 0.0241(3) 0.0324(4) -0.0005(2) 0.0080(3) 0.0027(2)
+Cs2 0.0251(3) 0.0380(4) 0.0278(4) -0.0017(3) 0.0060(3) -0.0016(3)
+Se1 0.0247(5) 0.0264(5) 0.0257(5) -0.0087(4) 0.0116(4) -0.0100(4)
+Se21 0.0224(5) 0.0256(5) 0.0235(5) -0.0053(4) 0.0012(4) -0.0033(4)
+Se2 0.0248(5) 0.0233(5) 0.0208(5) 0.0028(4) 0.0050(4) -0.0019(4)
+Se11 0.0258(5) 0.0279(5) 0.0250(5) -0.0013(4) 0.0092(4) 0.0059(4)
+As1 0.0153(4) 0.0209(4) 0.0177(4) -0.0003(3) 0.0014(3) 0.0000(3)
+As2 0.0199(5) 0.0159(4) 0.0225(5) -0.0004(4) 0.0049(4) -0.0009(3)
+loop_
+_atom_type_symbol
+_atom_type_description
+_atom_type_scat_dispersion_real
+_atom_type_scat_dispersion_imag
+_atom_type_scat_source
+As As 0.0499 2.0058 'International Tables Vol C Tables 4.2.6.8 and 6.1.1.4'
+Se Se -0.0929 2.2259 'International Tables Vol C Tables 4.2.6.8 and 6.1.1.4'
+Cs Cs -0.3680 2.1192 'International Tables Vol C Tables 4.2.6.8 and 6.1.1.4'
+loop_
+_geom_angle_atom_site_label_1
+_geom_angle_atom_site_label_2
+_geom_angle_atom_site_label_3
+_geom_angle_site_symmetry_3
+_geom_angle
+_geom_angle_publ_flag
+As2 Se1 As1 . 108.33(5) yes
+As1 Se2 As2 3_666 94.98(5) yes
+Se11 As1 Se2 . 98.49(5) yes
+Se11 As1 Se1 . 104.95(5) yes
+Se2 As1 Se1 . 101.59(5) yes
+Se21 As2 Se1 . 96.01(5) yes
+Se21 As2 Se2 3_666 101.09(5) yes
+Se1 As2 Se2 3_666 99.18(5) yes
+loop_
+_geom_bond_atom_site_label_1
+_geom_bond_atom_site_label_2
+_geom_bond_site_symmetry_2
+_geom_bond_distance
+_geom_bond_publ_flag
+Cs1 Se1 4_666 3.6877(13) yes
+Cs1 Se11 2_645 3.6966(13) yes
+Cs1 Se2 3_666 3.7185(13) yes
+Cs1 Se1 . 3.7192(16) yes
+Cs1 Se21 4_666 3.7518(14) yes
+Cs1 Se21 1_655 3.8114(16) yes
+Cs1 Se2 3_766 3.8516(13) yes
+Cs1 Se11 3_766 3.8949(16) yes
+Cs2 Se11 1_455 3.6352(14) yes
+Cs2 Se11 3_665 3.6801(14) yes
+Cs2 Se21 3_565 3.7009(16) yes
+Cs2 Se11 . 3.7377(14) yes
+Cs2 Se21 2 3.8412(14) yes
+Cs2 Se1 . 3.8778(14) yes
+Cs2 Se1 3_665 3.9099(16) yes
+Cs2 Se2 . 4.1289(18) yes
+Se1 As2 . 2.4306(13) yes
+Se1 As1 . 2.4676(13) yes
+Se21 As2 . 2.3223(13) yes
+Se2 As1 . 2.4372(13) yes
+Se2 As2 3_666 2.4403(15) yes
+Se11 As1 . 2.3092(14) yes
+As2 Se2 3_666 2.4403(15) yes
+loop_
+_geom_torsion_atom_site_label_1
+_geom_torsion_atom_site_label_2
+_geom_torsion_atom_site_label_3
+_geom_torsion_atom_site_label_4
+_geom_torsion_site_symmetry_1
+_geom_torsion_site_symmetry_4
+_geom_torsion
+_geom_torsion_publ_flag
+As2 Se2 As1 Se11 3_666 . -155.96(5) yes
+As2 Se2 As1 Se1 3_666 . 96.77(5) yes
+As2 Se1 As1 Se11 . . -110.96(6) yes
+As2 Se1 As1 Se2 . . -8.79(6) yes
+As1 Se1 As2 Se21 . . 178.95(5) yes
+As1 Se1 As2 Se2 . 3_666 -78.76(6) yes
