@@ -356,7 +356,8 @@ def c_gui_sources(suite):
   if not sources:
     raise AssertionError("the source combo offers nothing (%s)" % entries)
   old = nsa2_get_param('source')
-  done, dumps, base = [], set(), None
+  old_ptb = nsa2_get_param('PTB_PREREFINE')
+  done, dumps, base, ptb_seen = [], set(), None, False
   try:
     for src in sources:
       at = log_size()
@@ -378,7 +379,21 @@ def c_gui_sources(suite):
           src.strip(), tag_balance(dump), base[0], base[1]))
       dumps.add(hash(dump))
       done.append(src.strip())
+      # the first panel with the pTB pre-refine row: once more ticked, which
+      # adds its cycles spin box
+      if not ptb_seen and "NoSpherA2_ptb_prerefine" in dump:
+        ptb_seen = True
+        at = log_size()
+        nsa2_set_param('PTB_PREREFINE', True)
+        OV.UpdateHtml()
+        dump = snapshot("source_%s_ptb" % slug)
+        nsa2_set_param('PTB_PREREFINE', old_ptb)
+        _assert_clean(log_errors(at), "source %s, pTB pre-refine" % src.strip())
+        if "NoSpherA2_ptb_prerefine_cycles" not in dump or tag_balance(dump) != base[1]:
+          raise AssertionError("source %s, pTB pre-refine: no cycles box or table/tr balance %s, %s has %s"
+                               % (src.strip(), tag_balance(dump), base[0], base[1]))
   finally:
+    nsa2_set_param('PTB_PREREFINE', old_ptb)
     nsa2_set_param('source', old)
     OV.UpdateHtml()
   return "sources=%s distinct_panels=%d errors=0" % (",".join(done), len(dumps))
