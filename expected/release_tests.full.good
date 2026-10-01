@@ -19,7 +19,7 @@ PASS gui_log_clean  log_errors=8 Direct refinement failed (refinement failed), u
 PASS gui_nsa2_states  states=nowfn,nowfn_fullhar,wfn_mo0_hdef0,wfn_mo0_hdef1,wfn_mo1_hdef0,wfn_mo1_hdef1,map_surface,map_plane,map_points,map_hidden errors=0
 PASS gui_refine_nosphera2  controls=8/8 blocks=3 errors=0
 PASS gui_solve_flint  method=FLINT errors=0
-PASS gui_sources  sources=Thakkar IAM,discambMATTS2tsc,Tonto,xTB,pTB,ORCA 6.1,OCC,fragHAR,SALTED distinct_panels=9 errors=0
+PASS gui_sources  sources=Thakkar IAM,discambMATTS2tsc,Tonto,OCC,xTB,pTB,ORCA 6.1,fragHAR,SALTED distinct_panels=9 errors=0
 PASS gui_tabs_and_panels  rendered=home,work,view,tools,info,solve,refine,draw,report errors=0
 PASS hklf5_epoxide_ptb  tsc=epoxide.tscb cycles=1 R1_sph=0.0382 R1_asp=0.0368 paired=1886 basf=0.204
 PASS hybrid_zp2_discamb_orca  tsc=ZP2_total.tscb cycles=1 R1_sph=0.0380 R1_asp=0.0323 parts=1,2 atoms_part1=25 atoms_part2=25 part1=DiscaMB part2=ORCA wfn=ZP2_part2.gbw tables=ZP2_part_1.tsc ecp=0
