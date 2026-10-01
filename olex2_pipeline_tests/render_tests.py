@@ -83,13 +83,24 @@ def render(state, view=None):
     olx.Matr(*view)
   # fit to the atoms: the scene's own box grows by the cell and the map grid
   # after the first draw, and a fit to that shrinks the molecule to a dot
-  olex.m("sel -a")
-  fit = float(olex.f("gl.CalcZoom(true)"))
-  olex.m("sel -u")
+  # an empty selection makes CalcZoom(true) fall back to that scene box
+  # (glrender.cpp) - seen after a whole tier of cases, never in a subset - so
+  # repaint and select again until the fit is the atoms' own
+  for _ in range(5):
+    olex.m("sel -a")
+    fit = float(olex.f("gl.CalcZoom(true)"))
+    olex.m("sel -u")
+    if fit != float(olex.f("gl.CalcZoom(false)")):
+      break
+    olx.Refresh()
+  else:
+    print("render %s: the zoom fit is the scene's, not the atoms'" % state)
   olex.m("gl.Zoom -a %s" % (fit * ZOOM_OUT))
   olx.Refresh()
   if sys.platform == "win32":
     olx.Pict(path, PICT_WIDTH)  # the GL canvas alone; the macro is Windows-only
+  with open(os.path.join(gui_dir(), state + ".zoom.txt"), "w") as f:  # ponytail: diagnostic, drop once the flip is understood
+    f.write("fit=%s scene=%s zoom=%s\n" % (fit, olex.f("gl.CalcZoom(false)"), olex.f("gl.GetZoom()")))
   if not os.path.isfile(path):
     snapshot(state)  # elsewhere: the window shot, panels and all
   if not os.path.isfile(path):

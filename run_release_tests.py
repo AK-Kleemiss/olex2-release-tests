@@ -27,7 +27,13 @@ compare_golden.py:
     exit 1   a case failed, a number drifted, a case is missing, the run did
              not finish, or Olex2 did not start
 
---update-golden accepts the fresh log as the new golden instead of comparing.
+The screenshots the GUI and render cases take are compared with the reference
+pictures in expected/gui/<tier>.<platform>_<W>x<H>/ by compare_gui.py; a changed,
+new or missing picture fails the run, a screen size without references is a
+note.
+
+--update-golden accepts the fresh log and pictures as the new golden instead
+of comparing.
 
 Windows developers can pass --olex2c <olex2c.exe> to run the same thing
 through the console build (no window, needs PYTHONHOME of the Python the
@@ -44,6 +50,7 @@ import time
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import compare_golden  # noqa: E402
+import compare_gui  # noqa: E402
 
 RUNONCE = "runonce.release_tests.txm"
 TESTS_DIR = os.path.join(HERE, "olex2_pipeline_tests")
@@ -452,6 +459,8 @@ def main(argv=None):
         shutil.rmtree(scratch, ignore_errors=True)
 
     only = [c.strip() for c in args.cases.split(",") if c.strip()] if args.cases else None
+    gui_refs = compare_gui.ref_dir_for(os.path.join(out, "gui"), os.path.join(HERE, "expected", "gui"),
+                                       "%s.%s" % (tier_name, platform_tag()))
     if args.update_golden:
         if only:
             banner("NOT UPDATED", ["--update-golden needs the whole tier, not a --cases subset"])
@@ -467,6 +476,8 @@ def main(argv=None):
             return 1
         os.makedirs(os.path.dirname(golden), exist_ok=True)
         compare_golden.main([golden, log_path, "--update"])
+        if gui_refs:
+            compare_gui.update(os.path.join(out, "gui"), gui_refs)
         if skips:
             banner("GOLDEN HOLDS SKIPS", ["these cases were not run and have no reference:"]
                    + skips + ["rerun with everything installed and --update-golden"])
@@ -478,6 +489,8 @@ def main(argv=None):
                              "run once with --update-golden to create it"])
         return 1
     rc = compare_golden.compare(golden, log_path, only=only)
+    if gui_refs and compare_gui.compare(os.path.join(out, "gui"), gui_refs, whole_tier=not only) == 1:
+        rc = 1
     if not left_on_its_own and rc == 0:
         rc = 1
         print("Olex2 had to be killed, treating the run as failed")

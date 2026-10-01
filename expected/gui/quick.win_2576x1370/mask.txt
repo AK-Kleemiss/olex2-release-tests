@@ -1,0 +1,4 @@
+# x0 y0 x1 y1, inclusive; negative counts from the right/bottom edge
+0 15 99999 26
+0 94 99999 105
+0 -23 99999 -11

@@ -19,3 +19,18 @@ Accept a new golden only after the diff is understood:
 
 A per-platform file `release_tests.<tier>.<win|linux|mac>.good` overrides the
 shared one when present; add one only if a platform drifts beyond 0.0005 in R1.
+
+# Reference pictures
+
+`gui/<tier>.<platform>_<W>x<H>/` holds the screenshots of the GUI and render
+cases of one tier on one screen size. `compare_gui.py` fails the run when
+a picture changed (any pixel off by more than 24 in a channel outside
+`mask.txt`), is new or is missing, and paints the differing pixels magenta in
+`<out>/gui/diff/`. The render cases' GL pictures (`view_*`, `hirshfeld_*`,
+...) are compared and listed as `RENDER` but do not fail: `pict` draws the
+whole scene at one of two scales from run to run (ratio about the canvas
+aspect, cause not found yet; `<state>.zoom.txt` holds the zoom numbers it
+used, unchanged between the two). On a screen size with no folder here the pictures are only
+noted; `--update-golden` on the whole tier records them. `mask.txt` holds the
+rectangles that print the out dir (title bar, panel header, status bar); the
+default was measured on FLOWOFFICE, check it on the first diff of a new screen.

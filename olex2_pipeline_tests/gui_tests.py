@@ -21,6 +21,7 @@ import subprocess
 import sys
 import zlib
 
+import olex
 import olx
 from olexFunctions import OV
 
@@ -58,14 +59,16 @@ def gui_dir():
 
 
 def _need_gui(suite=None, sample="epoxide"):
-  """Skip without a GUI; with one, a structure on screen (the tabs only
-  exist for a loaded file) and the log flushed line by line so a case's
-  window of it is what Olex2 wrote during that case."""
+  """Skip without a GUI; with one, a fresh copy of the sample on screen (the
+  tabs only exist for a loaded file) and the log flushed line by line so a
+  case's window of it is what Olex2 wrote during that case. Fresh every time:
+  Olex2 reopens the last file at start-up, and a wavefunction or setting an
+  earlier run or case left next to it changes the pictures."""
   if not OV.HasGUI():
     raise SkipTest("no GUI (console build)")
   olx.app.AutoFlushLog("true")
   print("gui tests: log flushed")  # pushes the buffered start-up lines out now
-  if suite is not None and not os.path.isfile(olx.FileFull() or ""):
+  if suite is not None:
     from group_nsa2_matrix import sample_copy, _model_file, _load_model
     folder = sample_copy(suite, sample)
     _load_model(folder, _model_file(folder))
@@ -198,7 +201,20 @@ def snapshot(state):
   olx.html.Dump(os.path.join(d, state + ".html"))
   png = os.path.join(d, state + ".png")
   try:
-    ok = _shot_windows(png) if sys.platform == "win32" else _shot_posix(png)
+    # native controls in the html window still paint after that: shoot until
+    # two frames agree, else the reference pictures race the paint
+    last = None
+    for _ in range(8):
+      ok = _shot_windows(png) if sys.platform == "win32" else _shot_posix(png)
+      if not ok:
+        break
+      with open(png, "rb") as f:
+        now = f.read()
+      if now == last:
+        break
+      last = now
+      olx.Refresh()
+      time.sleep(0.2)
   except Exception as e:
     print("screenshot %s: %s" % (state, e))
     ok = False
@@ -212,6 +228,26 @@ def _controls_in(dump, names):
   missing = [n for n in names
              if not re.search(r"name\s*=\s*['\"]?%s\b" % re.escape(n), dump)]
   return missing
+
+
+def tag_balance(dump):
+  """Net open <table>/<tr> of a dump. Olex2's own pages are not balanced, so
+  this is compared between states of one panel: a row opened inside an
+  #ignoreif branch and closed outside it shifts it, and that row then widens
+  the whole panel."""
+  text = re.sub(r"<!--.*?-->", "", dump, flags=re.S)
+  return tuple(len(re.findall(r"<%s\b" % t, text, re.I)) -
+               len(re.findall(r"</%s\b" % t, text, re.I)) for t in ("table", "tr"))
+
+
+NSA2_BLOCKS = ("h3-NoSpherA2-extras", "h3-NoSpherA2-Properties", "h3-NoSpherA2-XCW")
+
+
+def open_nsa2_blocks():
+  args = []
+  for b in NSA2_BLOCKS:
+    args += [b, "1"]
+  olx.html.ItemState(*args)
 
 
 # ---------------------------------------------------------------------------
@@ -262,7 +298,7 @@ def c_gui_refine_nosphera2(suite):
   OV.SetParam('user.NoSpherA2.show_XCW', True)
   show_tab("work")
   show_panel("refine")
-  change_tsc_generator(REFINE_SOURCE)  # what the combo's onchange does
+  change_tsc_generator(_combo_entry(REFINE_SOURCE))  # what the combo's onchange does
   olx.html.ItemState("h3-NoSpherA2-extras", "1", "h3-NoSpherA2-Properties", "1",
                      "h3-NoSpherA2-XCW", "1")
   OV.UpdateHtml()
@@ -276,6 +312,16 @@ def c_gui_refine_nosphera2(suite):
   _assert_clean(log_errors(at), "refine panel")
   return "controls=%d/%d blocks=3 errors=0" % (
     len(REFINE_CONTROLS) - len(missing), len(REFINE_CONTROLS))
+
+
+def _combo_entry(name):
+  """The source combo's own spelling of name: its entries carry leading
+  blanks, and an unpadded value renders the combo blank."""
+  from NoSpherA2.NoSpherA2 import NoSpherA2_instance as nsp2
+  for s in nsp2.getwfn_softwares().split(";"):
+    if s.strip() == name:
+      return s
+  raise AssertionError("the source combo does not offer %r" % name)
 
 
 def _assert_choices_offered(src):
@@ -300,23 +346,24 @@ def c_gui_sources(suite):
   _need_gui(suite)
   from NoSpherA2.NoSpherA2 import NoSpherA2_instance as nsp2, change_tsc_generator
   from variableFunctions import nsa2_get_param, nsa2_set_param
+  nsa2_set_param('use_aspherical', True)
+  OV.SetParam('user.NoSpherA2.show_XCW', True)
   show_tab("work")
   show_panel("refine")
-  olx.html.ItemState("h3-NoSpherA2-extras", "1")
   entries = [s for s in nsp2.getwfn_softwares().split(";") if s.strip()]
   sources = [s for s in entries
              if not s.strip().startswith("Get ") and " -- " not in s]
   if not sources:
     raise AssertionError("the source combo offers nothing (%s)" % entries)
   old = nsa2_get_param('source')
-  done, dumps = [], set()
+  done, dumps, base = [], set(), None
   try:
     for src in sources:
       at = log_size()
       change_tsc_generator(src)
       # its "html.itemstate h3-NoSpherA2-extras 2 1" toggles the block, so
-      # open it again for the picture
-      olx.html.ItemState("h3-NoSpherA2-extras", "1")
+      # open all three again for the picture
+      open_nsa2_blocks()
       OV.UpdateHtml()
       slug = re.sub(r"[^A-Za-z0-9]+", "_", src.strip()).strip("_")
       dump = snapshot("source_" + slug)
@@ -325,12 +372,104 @@ def c_gui_sources(suite):
                              % (src.strip(), nsa2_get_param('source')))
       _assert_clean(log_errors(at), "source " + src.strip())
       _assert_choices_offered(src.strip())
+      base = base or (src.strip(), tag_balance(dump))
+      if tag_balance(dump) != base[1]:
+        raise AssertionError("source %s: table/tr balance %s, %s has %s" % (
+          src.strip(), tag_balance(dump), base[0], base[1]))
       dumps.add(hash(dump))
       done.append(src.strip())
   finally:
     nsa2_set_param('source', old)
     OV.UpdateHtml()
   return "sources=%s distinct_panels=%d errors=0" % (",".join(done), len(dumps))
+
+
+# a header get_nmo/get_ncen can read: the Properties panel only asks whether a
+# wavefunction is there and how many MOs and centres it has
+WFN_STUB = ("GUI test placeholder\n"
+            "GAUSSIAN             10 MOL ORBITALS     40 PRIMITIVES        6 NUCLEI\n")
+
+
+def c_gui_nsa2_states(suite):
+  """The three NoSpherA2 blocks with pTB through the switches that change
+  their layout: full HAR, a wavefunction there or not, the MO and HDEF
+  spin boxes, and a residual map shown as surface, plane and points and
+  hidden. Each state logs no error and keeps the table/tr balance of the
+  first, so no branch leaves a row open; a picture of each."""
+  _need_gui(suite)
+  from NoSpherA2.NoSpherA2 import change_tsc_generator
+  from NoSpherA2 import cubes_maps
+  from variableFunctions import nsa2_get_param, nsa2_set_param
+  nsa2_set_param('use_aspherical', True)
+  OV.SetParam('user.NoSpherA2.show_XCW', True)
+  show_tab("work")
+  show_panel("refine")
+  old_src = nsa2_get_param('source')
+  keys = ('full_HAR', 'Property_MO', 'Property_ATOM', 'map.type')
+  old = dict((k, nsa2_get_param(k)) for k in keys)
+  old_view = OV.GetParam('snum.xgrid.view')
+  wfn = os.path.join(OV.FilePath(), OV.ModelSrc() + ".wfn")
+  stub = cubes_maps._wfn_file() is None
+  done, base = [], None
+
+  def state(name, **params):
+    nonlocal base
+    at = log_size()
+    for k, v in params.items():
+      nsa2_set_param(k, v)
+    open_nsa2_blocks()
+    OV.UpdateHtml()
+    dump = snapshot("nsa2_" + name)
+    _assert_clean(log_errors(at), "NoSpherA2 state " + name)
+    base = base or (name, tag_balance(dump))
+    if tag_balance(dump) != base[1]:
+      raise AssertionError("state %s: table/tr balance %s, %s has %s" % (
+        name, tag_balance(dump), base[0], base[1]))
+    done.append(name)
+    return dump
+
+  try:
+    change_tsc_generator(_combo_entry(REFINE_SOURCE))
+    if stub:
+      state("nowfn", full_HAR=False, Property_MO=False, Property_ATOM=False)
+      state("nowfn_fullhar", full_HAR=True)
+      with open(wfn, "w") as f:
+        f.write(WFN_STUB)
+    for mo in (False, True):
+      for atom in (False, True):
+        state("wfn_mo%d_hdef%d" % (mo, atom), full_HAR=False,
+              Property_MO=mo, Property_ATOM=atom)
+    # an independent-atom residual map: with NoSpherA2 on it wants a .tsc
+    # this model has none
+    at = log_size()
+    nsa2_set_param('use_aspherical', False)
+    nsa2_set_param('map.type', "diff")
+    cubes_maps.change_map()
+    nsa2_set_param('use_aspherical', True)
+    OV.UpdateHtml()  # the blocks are back in the page before ItemState opens them
+    _assert_clean(log_errors(at), "residual map")
+    if olx.xgrid.Visible() != "true":
+      done.append("map:none")  # no residual map for this model: the map rows stay untested
+    else:
+      for view in ("surface", "plane", "points"):
+        OV.SetParam('snum.xgrid.view', view)
+        olex.m("spy.gui.maps.SetXgridView()")
+        dump = state("map_" + view)
+        if "SET_SNUM_XGRID_VIEW" not in dump:
+          raise AssertionError("map %s: no View row" % view)
+      cubes_maps.hide_map()
+      state("map_hidden")
+      cubes_maps.hide_map(False)
+  finally:
+    cubes_maps.disable_map()
+    for k, v in old.items():
+      nsa2_set_param(k, v)
+    OV.SetParam('snum.xgrid.view', old_view)
+    nsa2_set_param('source', old_src)
+    if stub and os.path.isfile(wfn):
+      os.remove(wfn)
+    OV.UpdateHtml()
+  return "states=%s errors=0" % ",".join(done)
 
 
 def c_gui_dispradial(suite):
@@ -390,6 +529,7 @@ CASES = [
   ("gui_tabs_and_panels",   c_gui_tabs_and_panels),
   ("gui_refine_nosphera2",  c_gui_refine_nosphera2),
   ("gui_sources",           c_gui_sources),
+  ("gui_nsa2_states",       c_gui_nsa2_states),
   ("gui_dispradial",        c_gui_dispradial),
   ("gui_solve_flint",       c_gui_solve_flint),
   ("gui_log_clean",         c_gui_log_clean),

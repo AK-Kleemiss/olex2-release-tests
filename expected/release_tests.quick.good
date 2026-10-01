@@ -16,6 +16,7 @@ PASS flint_water  sg=P2<sub>1</sub>/c sg_rank=1 n_suggest=5 chooser_r1=0.221,0.3
 PASS grown_water_ptb  tsc=water.tscb cycles=1 R1_sph=0.0333 R1_asp=0.0295 atoms_asu=26 atoms_grown=48 multiplicity=6
 PASS gui_dispradial  panel=DispRadial errors=0
 PASS gui_log_clean  log_errors=8 Direct refinement failed (refinement failed), using the macro | During handling of the above exception, another exception occurred: | Error reading dictionary at line <n> | Failed to read the '_geom_hbond loop: Invalid float format '?' at [D:\ | Plugin loader initialisation failed: 'Module use of python<n>.dll conf | Refinement failed | Traceback (most recent call last): | raise RuntimeError("refinement failed")
+PASS gui_nsa2_states  states=nowfn,nowfn_fullhar,wfn_mo0_hdef0,wfn_mo0_hdef1,wfn_mo1_hdef0,wfn_mo1_hdef1,map_surface,map_plane,map_points,map_hidden errors=0
 PASS gui_refine_nosphera2  controls=8/8 blocks=3 errors=0
 PASS gui_solve_flint  method=FLINT errors=0
 PASS gui_sources  sources=Thakkar IAM,discambMATTS2tsc,Tonto,xTB,pTB,ORCA 6.1,OCC,fragHAR,SALTED distinct_panels=9 errors=0
@@ -36,4 +37,4 @@ PASS salted_v6_sucrose  tsc=sucrose.tscb cycles=1 R1_sph=0.0344 R1_asp=0.0288 mo
 PASS setup  
 PASS twin_hklf4_epoxide_ptb  tsc=epoxide.tscb cycles=1 R1_sph=0.0314 R1_asp=0.0302 paired=1886 basf=0.205
 PASS xcw_epoxide  tscbs=NA2_0000000.tscb;NA2_0010000.tscb status="finished, no halting lambda reported" gui=run,stop,use source=epoxide_xcw_0010000.tscb R1_sph=0.0353 R1_xcw=0.0311
-END 38 0 0
+END 39 0 0
