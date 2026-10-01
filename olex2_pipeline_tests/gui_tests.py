@@ -333,6 +333,49 @@ def c_gui_sources(suite):
   return "sources=%s distinct_panels=%d errors=0" % (",".join(done), len(dumps))
 
 
+def c_gui_dispradial(suite):
+  """The DispRadial tool panel, opened from the Tools tab. disp_radial is
+  imported at start-up only when user.refinement.dispradial is set, so the
+  case cannot switch it on for itself."""
+  _need_gui(suite)
+  if not OV.GetParam('user.refinement.dispradial', False):
+    raise SkipTest("user.refinement.dispradial is off")
+  at = log_size()
+  show_tab("tools")
+  olx.html.ItemState("h2-tools*", "2", "h2-tools-DispRadial-DispRadial", "1")
+  OV.UpdateHtml()
+  dump = snapshot("tool_dispradial")
+  if "DispRadial.htm" not in dump:
+    raise AssertionError("the Tools tab has no DispRadial panel")
+  _assert_clean(log_errors(at), "DispRadial panel")
+  return "panel=DispRadial errors=0"
+
+
+def c_gui_solve_flint(suite):
+  """The solve panel with FLINT chosen, as the method combo's onchange does,
+  and its extra settings open."""
+  _need_gui(suite)
+  if not OV.GetParam('user.solution.flint', False):
+    raise SkipTest("user.solution.flint is off")
+  old = (OV.GetParam('snum.solution.program'), OV.GetParam('snum.solution.method'))
+  at = log_size()
+  try:
+    show_tab("work")
+    show_panel("solve")
+    OV.set_solution_program("olex2.solve", "FLINT")
+    olx.html.ItemState("solution-settings-extra", "1")
+    OV.UpdateHtml()
+    snapshot("solve_flint")
+    if OV.GetParam('snum.solution.method') != "FLINT":
+      raise AssertionError("choosing FLINT left the method at %r"
+                           % OV.GetParam('snum.solution.method'))
+    _assert_clean(log_errors(at), "solve panel with FLINT")
+  finally:
+    OV.set_solution_program(*old)
+    OV.UpdateHtml()
+  return "method=FLINT errors=0"
+
+
 def c_gui_log_clean(suite):
   """What Olex2 logged since it started - the GUI build-up and the
   refinements included - that reads as an error, as distinct kinds (numbers
@@ -347,5 +390,7 @@ CASES = [
   ("gui_tabs_and_panels",   c_gui_tabs_and_panels),
   ("gui_refine_nosphera2",  c_gui_refine_nosphera2),
   ("gui_sources",           c_gui_sources),
+  ("gui_dispradial",        c_gui_dispradial),
+  ("gui_solve_flint",       c_gui_solve_flint),
   ("gui_log_clean",         c_gui_log_clean),
 ]
