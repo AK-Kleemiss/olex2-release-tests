@@ -28,6 +28,7 @@ import os
 import shutil
 import sys
 
+import olex
 import olx
 from olexFunctions import OV
 
@@ -40,6 +41,12 @@ PICT_WIDTH = "900"
 # at that width a canvas holding nothing but the background colour compresses
 # to about 2 kB; anything drawn on it is far more
 MIN_PNG = 8000
+# the camera is fitted to the atoms and then backed off far enough that a
+# surface or a map around them stays inside the frame too
+ZOOM_OUT = 0.5
+# grid spacing in Angstrom for the cubes, the Fourier maps and the surfaces:
+# at 0.5 an isosurface comes out as octahedra
+GRID = "0.15"
 
 # down each cell axis, and one camera that is the same on every structure
 VIEWS = [("a", ("a",)), ("b", ("b",)), ("c", ("c",)),
@@ -74,6 +81,12 @@ def render(state, view=None):
     os.remove(path)
   if view:
     olx.Matr(*view)
+  # fit to the atoms: the scene's own box grows by the cell and the map grid
+  # after the first draw, and a fit to that shrinks the molecule to a dot
+  olex.m("sel -a")
+  fit = float(olex.f("gl.CalcZoom(true)"))
+  olex.m("sel -u")
+  olex.m("gl.Zoom -a %s" % (fit * ZOOM_OUT))
   olx.Refresh()
   if sys.platform == "win32":
     olx.Pict(path, PICT_WIDTH)  # the GL canvas alone; the macro is Windows-only
@@ -119,7 +132,7 @@ def c_render_hirshfeld(suite):
   import cubes_maps
   at = log_size()
   bare = render("hirshfeld_bare", VIEWS[0][1])  # the model alone, same camera
-  with _params(**{"map.resolution": "0.4"}):
+  with _params(**{"map.resolution": GRID}):
     cubes_maps.hirshfeld_surface("Hirshfeld d_norm")
     values = cubes_maps._hs_values("Hirshfeld d_norm")
     if values is None or not len(values):
@@ -143,7 +156,7 @@ def c_render_esp_surface(suite):
     raise SkipTest("no wavefunction and no SALTED model selected")
   at = log_size()
   bare = render("esp_surface_bare", VIEWS[0][1])
-  with _params(**{"map.type": "ESP surface", "map.resolution": "0.4"}):
+  with _params(**{"map.type": "ESP surface", "map.resolution": GRID}):
     cubes_maps.change_map()
     obj = cubes_maps._surface_obj("ESP surface")
     if not os.path.isfile(obj):
@@ -169,7 +182,7 @@ def c_render_map(suite):
   cubes_maps.disable_map()
   at = log_size()
   bare = render("map_bare", VIEWS[0][1])
-  cubes_maps.show_fft_map(0.3, "diff")
+  cubes_maps.show_fft_map(float(GRID), "diff")
   pics = _cameras("map_diff", VIEWS[:3])
   if pics[0] == bare:
     raise AssertionError("the picture is what it was without the map - "
@@ -187,18 +200,31 @@ def c_render_map(suite):
 PROPERTY_CUBES = [("Property_Lap", ["lap"]), ("Property_Eli", ["eli"]),
                   ("Property_Elf", ["elf"]), ("Property_RDG", ["rdg", "signed_rho"]),
                   ("Property_ESP", ["esp"]), ("Property_DEF", ["def"]),
-                  ("Property_MO", ["MO_0"])]
+                  ("Property_MO", ["MO_%d"])]   # filled in with HOMO-1, see _homo
 # SALTED predicts a density, not orbitals, and calculate_cubes turns these back
 # off with a line in the log - so a SALTED workflow can only reach the other three
 NEEDS_WFN = ("Property_Elf", "Property_RDG", "Property_DEF", "Property_MO")
 WORKFLOW_CUBE_TIMEOUT = 900.0   # seconds for the seven cubes of a properties run
-# the surfaces have their own cases above, and the intermolecular NCI is a run
-# over the whole displayed cluster - more than a picture is worth here
-SKIP_TYPES = ("Intermolecular NCI",)
+# the surfaces have their own cases above; the intermolecular NCI is a
+# promolecular run over the displayed cluster that change_map starts itself
+SKIP_TYPES = ()
 
 
 def _slug(text):
   return "_".join("".join(c if c.isalnum() else " " for c in text).split()).lower()
+
+
+def _homo():
+  """1-based number of the HOMO of the asymmetric unit, closed shell: the
+  core orbital MO 1 is a dot on one atom, HOMO-1 spreads over the bonds."""
+  from cctbx.eltbx import tiny_pse
+  from variableFunctions import nsa2_get_param
+  n = int(olx.xf.au.GetAtomCount())
+  live = lambda i: not any(str(f(i)).lower() in ("true", "1")   # the au keeps both
+                           for f in (olx.xf.au.IsAtomDeleted, olx.xf.au.IsPeak))
+  z = sum(tiny_pse.table(str(olx.xf.au.GetAtomType(i)).strip().capitalize()).atomic_number()
+          for i in range(n) if live(i))
+  return (z - int(nsa2_get_param('charge') or 0)) // 2
 
 
 def _wfn_beside(folder):
@@ -265,25 +291,31 @@ def c_render_workflow(suite, sample, backend):
 
   name = OV.ModelSrc()
   wfn = _wfn_beside(folder)
+  mo = _homo() - 1   # HOMO-1, 1-based; NoSpherA2 gets -MO mo-1 and names the cube after it
   flags = dict((k, bool(wfn) or k not in NEEDS_WFN) for k, _ in PROPERTY_CUBES)
-  wanted = [c for k, cs in PROPERTY_CUBES if flags[k] for c in cs]
+  wanted = [c.replace("%d", str(mo - 1)) for k, cs in PROPERTY_CUBES if flags[k] for c in cs]
   cubes = [cubes_maps._p("%s_%s.cube" % (name, w)) for w in wanted]
-  for c in cubes:   # a cube of an earlier case must not pass as this run's
-    for f in (c, c + "b"):
-      if os.path.isfile(f):
-        os.remove(f)
+  esp_obj = cubes_maps._surface_obj("ESP surface")
+  hs_objs = [cubes_maps._surface_obj(t) for t in cubes_maps.HS_COLUMNS]
+  # a cube or a surface of an earlier case must not pass as this run's
+  for f in [c + x for c in cubes for x in ("", "b")] + [esp_obj] + hs_objs \
+           + [cubes_maps._p("Hirshfeld_surface.dat", cubes_maps._frag_dir()),
+              cubes_maps._surface_obj("Intermolecular NCI")]:
+    if os.path.isfile(f):
+      os.remove(f)
   flags.update({"Property_ATOM": False, "Property_all_MOs": False,
-                "Property_ESP_surface": False,
-                # the phil default 0 goes out as -MO -1 and NoSpherA2 dies on it;
-                # the GUI spinner starts at 1, which is the MO_0 cube wanted above
-                "Property_MO_number": "1",
-                "map.radius": "1.0", "map.resolution": "0.5"})
+                "Property_ESP_surface": False, "Property_MO_number": str(mo),
+                "map.radius": "1.0", "map.resolution": GRID})
   with _params(**flags):
     cubes_maps.calculate_cubes()
   _settle(cubes, timeout=WORKFLOW_CUBE_TIMEOUT)
 
-  skip = set(cubes_maps.SURFACE_OBJS) | set(SKIP_TYPES)
-  offered = [t for t in str(cubes_maps.get_map_types()).split(";") if t and t not in skip]
+  # the NoSpherA2 surfaces: the ESP one is its own mesh of this run's density,
+  # the six Hirshfeld ones come from one run that change_map starts on demand -
+  # the menu lists those only once their obj exists, so they are added here
+  offered = [t for t in str(cubes_maps.get_map_types()).split(";")
+             if t and t not in SKIP_TYPES and t not in cubes_maps.HS_COLUMNS]
+  offered += list(cubes_maps.HS_COLUMNS)
   if not offered:
     raise AssertionError("the properties run left no map type on the menu")
   cubes_maps.disable_map()
@@ -292,7 +324,9 @@ def c_render_workflow(suite, sample, backend):
   for entry in offered:
     # the combo is built as "Residual<-diff": the name is shown, the value is set
     label, _, value = entry.partition("<-")
-    with _params(**{"map.type": value or label, "map.resolution": "0.5"}):
+    # change_map reads the MO number again, so it has to stay the calculated one
+    with _params(**{"map.type": value or label, "map.resolution": GRID,
+                    "Property_MO_number": str(mo)}):
       cubes_maps.change_map()
       pic = render("%s_%s" % (prefix, _slug(label)), VIEWS[0][1])
     if pic == bare:
@@ -301,9 +335,18 @@ def c_render_workflow(suite, sample, backend):
     pics.append(pic)
     shown.append(label)
   _assert_clean(log_errors(at), "%s workflow" % backend)
+  if "ESP surface" in shown and not os.path.isfile(esp_obj):
+    raise AssertionError("no %s written" % os.path.basename(esp_obj))
+  esp_faces = sum(1 for line in open(esp_obj, errors="ignore")
+                  if line.startswith("f ")) if "ESP surface" in shown else 0
+  for t in cubes_maps.HS_COLUMNS:
+    values = cubes_maps._hs_values(t)
+    if values is None or not len(values):
+      raise AssertionError("%s: no column in Hirshfeld_surface.dat" % t)
   return " ".join(["source=%s" % backend, "solved=%d" % solved,
                    "hydrogens=%d" % hydrogens, "cubes=%s" % ",".join(wanted),
-                   "maps=%s" % ",".join(shown),
+                   "maps=%s" % ",".join(shown), "esp_faces=%d" % esp_faces,
+                   "hs_faces=%d" % len(values),
                    "distinct=%d" % len(set(pics)), "errors=0"])
 
 

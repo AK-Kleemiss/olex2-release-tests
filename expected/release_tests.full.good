@@ -2,7 +2,7 @@ PASS cubes_epoxide_ptb  tsc=epoxide.tscb cycles=1 R1_sph=0.0353 R1_asp=0.0344 cu
 PASS discamb_gui_get_entry  get_entries=1 opened=discamb
 PASS discamb_sucrose  tsc=sucrose.tsc cycles=1 R1_sph=0.0344 R1_asp=0.0292
 PASS flint_cod_1560875  sg=P2<sub>1</sub>/c sg_rank=1 n_suggest=6 chooser_r1=0.216,0.331,0.368,0.149 addsym=Pncm trials=8 cc=0.968 peaks=26 geometry_changed=0 allowed=Gd,O,P pruned=3 retyped=2 atoms=26 types=Gd:2,O:12,P:12 typed=0.90
-PASS flint_cod_2013004  sg=P2<sub>1</sub> sg_rank=3 n_suggest=4 chooser_r1=0.315,0.335,0.237,0.265 addsym=P121/m1 trials=1 cc=0.992 peaks=44 geometry_changed=0 allowed=K,Mn,O,P,Sr pruned=11 retyped=7 atoms=44 types=K:5,Mn:1,O:25,P:9,Sr:4 typed=0.97
+PASS flint_cod_2013004  sg=P2<sub>1</sub> sg_rank=3 n_suggest=4 chooser_r1=0.315,0.335,0.237,0.265 addsym=- trials=1 cc=0.992 peaks=44 geometry_changed=0 allowed=K,Mn,O,P,Sr pruned=11 retyped=8 atoms=44 types=K:4,Mn:3,O:25,P:9,Sr:3 typed=1.00
 PASS flint_cod_2104335  sg=P4<sub>3</sub> sg_rank=2 n_suggest=4 chooser_r1=0.383,0.216,0.395,0.506 addsym=P42/m(c,a,b) trials=4 cc=0.996 peaks=32 geometry_changed=0 allowed=Ca,O,Te pruned=1 retyped=0 atoms=32 types=Ca:4,O:20,Te:8 typed=0.96
 PASS flint_cod_2108240  sg=-I 1 sg_rank=1 n_suggest=2 chooser_r1=0.231,0.070 addsym=- trials=8 cc=0.984 peaks=33 geometry_changed=0 allowed=Al,Ca,Na,O,Si pruned=5 retyped=11 atoms=33 types=Al:3,Ca:3,O:23,Si:4 typed=0.65
 PASS flint_cod_2108989  sg=R32 sg_rank=1 n_suggest=4 chooser_r1=0.232,0.300,0.232,0.371 addsym=- trials=8 cc=0.990 peaks=8 geometry_changed=0 allowed=B,Bi,Fe,O,Sm pruned=1 retyped=2 atoms=8 types=B:3,Fe:1,O:3,Sm:1 typed=0.88
@@ -32,15 +32,15 @@ PASS part_hirshfeld_epoxide  tsc=epoxide.tscb cycles=1 R1_sph=0.0353 R1_asp=0.03
 PASS part_mbis_epoxide  tsc=epoxide.tscb cycles=1 R1_sph=0.0353 R1_asp=0.0345 partition=MBIS ecp=6
 PASS part_tfvc_epoxide  tsc=epoxide.tscb cycles=1 R1_sph=0.0353 R1_asp=0.0342 partition=TFVC ecp=6
 PASS ptb_ecp_malbac  tsc=malbac.tscb cycles=1 R1_sph=0.0668 R1_asp=0.0661 protons=276 electrons=170.0 ecp=106
-PASS render_esp_surface  faces=1420 views=a,b,c distinct=3 errors=0
-PASS render_hirshfeld  faces=1620 views=a,b,c distinct=3 errors=0
+PASS render_esp_surface  faces=10072 views=a,b,c distinct=3 errors=0
+PASS render_hirshfeld  faces=11404 views=a,b,c distinct=3 errors=0
 PASS render_map  map=diff views=a,b,c distinct=3 errors=0
 PASS render_views  views=a,b,c,cart distinct=4 errors=0
-PASS render_workflow_orca  source=ORCA solved=9 hydrogens=4 cubes=lap,eli,elf,rdg,signed_rho,esp,def,MO_0 maps=Residual,Deformation,2Fo-Fc,Fobs,Fcalc,ELI-D,Laplacian,ELF,ESP,RDG,Stat. Def.,NCI,Rho + ESP,Rho + ELI,MO distinct=12 errors=0
-PASS render_workflow_salted  source=SALTED solved=9 hydrogens=4 cubes=lap,eli,esp maps=Residual,Deformation,2Fo-Fc,Fobs,Fcalc,ELI-D,Laplacian,ESP,Rho + ESP,Rho + ELI distinct=8 errors=0
-PASS salted_v6_epoxide  tsc=epoxide.tscb cycles=1 R1_sph=0.0353 R1_asp=0.0323 model=combo_v6.salted
+PASS render_workflow_orca  source=ORCA solved=9 hydrogens=4 cubes=lap,eli,elf,rdg,signed_rho,esp,def,MO_10 maps=Residual,Deformation,2Fo-Fc,Fobs,Fcalc,ELI-D,Laplacian,ELF,ESP,ESP surface,Intermolecular NCI,RDG,Stat. Def.,NCI,MO,Hirshfeld d_i,Hirshfeld d_e,Hirshfeld d_norm,Hirshfeld ESP,Hirshfeld shape index,Hirshfeld curvedness esp_faces=9928 hs_faces=11028 distinct=21 errors=0
+PASS render_workflow_salted  source=SALTED solved=9 hydrogens=4 cubes=lap,eli,esp maps=Residual,Deformation,2Fo-Fc,Fobs,Fcalc,ELI-D,Laplacian,ESP,ESP surface,Intermolecular NCI,Hirshfeld d_i,Hirshfeld d_e,Hirshfeld d_norm,Hirshfeld ESP,Hirshfeld shape index,Hirshfeld curvedness esp_faces=10188 hs_faces=11024 distinct=16 errors=0
+PASS salted_v6_epoxide  tsc=epoxide.tscb cycles=1 R1_sph=0.0353 R1_asp=0.0324 model=combo_v6.salted
 PASS salted_v6_sucrose  tsc=sucrose.tscb cycles=1 R1_sph=0.0344 R1_asp=0.0288 model=combo_v6.salted
 PASS setup  
 PASS twin_hklf4_epoxide_ptb  tsc=epoxide.tscb cycles=1 R1_sph=0.0314 R1_asp=0.0302 paired=1886 basf=0.205
-PASS xcw_epoxide  tscbs=NA2_0000000.tscb;NA2_0010000.tscb status="finished, no halting lambda reported" gui=run,stop,use source=epoxide_xcw_0010000.tscb R1_sph=0.0353 R1_xcw=0.0312
+PASS xcw_epoxide  tscbs=NA2_0000000.tscb;NA2_0010000.tscb status="finished, no halting lambda reported" gui=run,stop,use source=epoxide_xcw_0010000.tscb R1_sph=0.0353 R1_xcw=0.0311
 END 45 0 0
